@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FORGE">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#08080A">
+<title>FORGE — Victor</title>
+<style>
+:root{
+  --bg:#08080A; --surf:#131317; --surf2:#1C1C22; --surf3:#26262E;
+  --line:#2C2C35; --txt:#F4F4F6; --dim:#8B8B96; --dim2:#5E5E68;
+  --acc:#D8FF3E; --acc-d:#A8C92C; --warn:#FF7A45; --ok:#4ADE80; --bad:#F87171;
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--txt);}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.45;
+  padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:contain;
+  -webkit-font-smoothing:antialiased;
+}
+input,button,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+::-webkit-scrollbar{display:none}
+
+/* ---------- typography ---------- */
+.h1{font-size:26px;font-weight:800;letter-spacing:-.6px}
+.h2{font-size:18px;font-weight:750;letter-spacing:-.3px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim2)}
+.dim{color:var(--dim)}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- layout ---------- */
+.wrap{padding:0 16px;max-width:620px;margin:0 auto}
+.topbar{
+  position:sticky;top:0;z-index:40;
+  padding:calc(env(safe-area-inset-top) + 14px) 16px 12px;
+  background:linear-gradient(180deg,var(--bg) 65%,transparent);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+  max-width:620px;margin:0 auto;
+}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card.flat{background:var(--surf);border-color:transparent}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sp{height:8px}.sp16{height:16px}.sp24{height:24px}
+
+/* ---------- nav ---------- */
+nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:rgba(10,10,12,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--line);
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  display:flex;justify-content:space-around;
+}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:var(--dim2);transition:color .15s}
+nav button.on{color:var(--acc)}
+nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav span{font-size:10px;font-weight:700;letter-spacing:.2px}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--acc);color:#0A0A0C;font-weight:800;font-size:16px;
+  padding:16px;border-radius:14px;width:100%;letter-spacing:-.2px;
+  transition:transform .1s,opacity .15s;
+}
+.btn:active{transform:scale(.975)}
+.btn.ghost{background:var(--surf2);color:var(--txt);border:1px solid var(--line)}
+.btn.sm{padding:11px 14px;font-size:14px;width:auto;border-radius:11px}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid #3a1f1f}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;background:var(--surf2);border:1px solid var(--line);
+  border-radius:999px;padding:5px 11px;font-size:12px;font-weight:650;color:var(--dim)
+}
+.chip.acc{background:rgba(216,255,62,.12);border-color:rgba(216,255,62,.28);color:var(--acc)}
+.chip.warn{background:rgba(255,122,69,.12);border-color:rgba(255,122,69,.3);color:var(--warn)}
+.chip.ok{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.25);color:var(--ok)}
+.pillbar{display:flex;gap:6px;background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px}
+.pillbar button{flex:1;padding:9px 6px;border-radius:9px;font-size:13px;font-weight:700;color:var(--dim)}
+.pillbar button.on{background:var(--surf3);color:var(--txt)}
+
+/* ---------- session card ---------- */
+.sesshero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#1A1A20,#101014);
+  border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:12px;
+}
+.sesshero::after{
+  content:"";position:absolute;right:-60px;top:-60px;width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,rgba(216,255,62,.16),transparent 68%);pointer-events:none
+}
+.tag{
+  display:inline-block;font-size:10px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;
+  padding:4px 9px;border-radius:6px;background:var(--acc);color:#0A0A0C
+}
+
+/* ---------- exercise ---------- */
+.ex{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.ex.done{border-color:rgba(216,255,62,.3)}
+.exhead{padding:14px 15px;display:flex;gap:12px;align-items:flex-start}
+.exidx{
+  flex:0 0 26px;height:26px;border-radius:8px;background:var(--surf3);color:var(--dim);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-top:1px
+}
+.ex.done .exidx{background:var(--acc);color:#0A0A0C}
+.exname{font-size:15px;font-weight:700;letter-spacing:-.2px;line-height:1.3}
+.exmeta{font-size:12px;color:var(--dim);margin-top:3px}
+.exbody{padding:0 15px 14px}
+.setrow{display:grid;grid-template-columns:30px 1fr 1fr 46px;gap:8px;align-items:center;margin-bottom:7px}
+.setrow .lbl{font-size:12px;font-weight:800;color:var(--dim2);text-align:center}
+.inp{
+  background:var(--surf2);border:1px solid var(--line);border-radius:10px;
+  padding:11px 8px;text-align:center;font-size:16px;font-weight:700;width:100%;
+  font-variant-numeric:tabular-nums;
+}
+.inp:focus{outline:none;border-color:var(--acc-d);background:var(--surf3)}
+.inp::placeholder{color:var(--dim2);font-weight:500}
+.tick{
+  height:42px;border-radius:10px;background:var(--surf2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;color:var(--dim2);
+}
+.tick.on{background:var(--acc);border-color:var(--acc);color:#0A0A0C}
+.tick svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.hint{font-size:12px;color:var(--dim);background:var(--surf2);border-radius:10px;padding:9px 11px;margin-bottom:10px;line-height:1.4}
+.hint b{color:var(--txt);font-weight:700}
+.cue{font-size:12.5px;color:var(--dim);line-height:1.5;padding:10px 12px;background:rgba(255,255,255,.025);border-left:2px solid var(--surf3);border-radius:0 8px 8px 0}
+
+/* ---------- rest timer ---------- */
+#timer{
+  position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:60;
+  background:rgba(216,255,62,.97);color:#0A0A0C;border-radius:14px;padding:13px 16px;
+  display:none;align-items:center;justify-content:space-between;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:596px;margin:0 auto;
+}
+#timer.show{display:flex}
+#timer .t{font-size:24px;font-weight:850;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+#timer .lab{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;opacity:.65}
+#timer button{background:rgba(0,0,0,.14);border-radius:9px;padding:8px 12px;font-weight:800;font-size:13px;color:#0A0A0C}
+
+/* ---------- progress / chart ---------- */
+.stat{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:13px}
+.stat .v{font-size:22px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.stat .k{font-size:11px;color:var(--dim);font-weight:600;margin-top:2px}
+.bar{height:7px;border-radius:4px;background:var(--surf3);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--acc);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:9px 4px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:11px;color:var(--dim2);font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+
+/* ---------- collapsible ---------- */
+details{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+details summary{padding:15px;font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"›";font-size:22px;color:var(--dim2);transform:rotate(90deg);transition:transform .2s;line-height:1}
+details[open] summary::after{transform:rotate(-90deg)}
+details .inner{padding:0 15px 15px}
+
+/* ---------- misc ---------- */
+.banner{background:rgba(255,122,69,.1);border:1px solid rgba(255,122,69,.28);color:#FFC5AC;border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:12px;line-height:1.45}
+.coach{background:linear-gradient(150deg,rgba(216,255,62,.09),rgba(216,255,62,.02));border:1px solid rgba(216,255,62,.22);border-radius:var(--r);padding:15px;margin-bottom:12px}
+.coach .t{font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--acc);margin-bottom:7px}
+.coach p{font-size:14px;line-height:1.5;margin-bottom:6px}
+.coach p:last-child{margin-bottom:0}
+.macro{display:flex;align-items:baseline;gap:6px}
+.macro .b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.macro .u{font-size:11px;color:var(--dim);font-weight:600}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex:0 0 6px}
+ul.li{list-style:none;display:flex;flex-direction:column;gap:7px}
+ul.li li{display:flex;gap:9px;font-size:13.5px;line-height:1.45;color:var(--dim)}
+ul.li li .dot{margin-top:7px}
+ul.li li b{color:var(--txt);font-weight:650}
+.ol{counter-reset:s;display:flex;flex-direction:column;gap:9px;list-style:none}
+.ol li{counter-increment:s;display:flex;gap:10px;font-size:13.5px;line-height:1.45;color:var(--dim)}
+.ol li::before{content:counter(s);flex:0 0 20px;height:20px;border-radius:6px;background:var(--surf3);color:var(--dim);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<div id="timer">
+  <div><div class="lab">Repos</div><div class="t" id="tval">1:30</div></div>
+  <div class="row" style="gap:7px">
+    <button onclick="addRest(-15)">−15</button>
+    <button onclick="addRest(15)">+15</button>
+    <button onclick="stopRest()">Skip</button>
+  </div>
+</div>
+
+<nav id="nav"></nav>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════
+   1. PROGRAMME
+   ══════════════════════════════════════════ */
+
+const PROGRAM = {
+  A:{
+    key:"A", name:"POUSSÉE", sub:"Pecs · Épaules · Triceps",
+    focus:"La séance qui construit le volume frontal : haut de pecs et deltoïdes.",
+    ex:[
+      {id:"a1",n:"Développé incliné haltères",m:"Haut de pecs",sets:4,lo:6,hi:10,rest:120,
+       cue:"Banc à 30° max. <b>Spécifique à toi :</b> arrête de chercher à plaquer les deux omoplates à plat sur le banc — avec ta gibbosité c'est mécaniquement impossible et forcer ne fera que crisper le côté droit. Cale-toi confortablement, garde la poitrine sortie, et laisse chaque bras suivre sa trajectoire naturelle. Les haltères permettent exactement ça, c'est pour cette raison qu'ils remplacent la barre ici. Descente contrôlée en 2 secondes, remontée explosive.",
+       alt:"Machine à convergence inclinée (encore mieux si elle est à bras indépendants)."},
+      {id:"a2",n:"Landmine press unilatéral",m:"Épaules avant / haut de pecs",sets:3,lo:8,hi:12,rest:90,uni:true,
+       cue:"Une extrémité de barre dans le coin ou dans le sabot, tu pousses en diagonale vers le haut, un bras à la fois. <b>C'est le remplaçant du développé militaire :</b> l'omoplate reste libre de tourner naturellement, il n'y a aucune compression verticale sur la colonne, et chaque côté travaille indépendamment. Avec une scoliose rotative c'est nettement supérieur à une poussée au-dessus de la tête. Commence toujours par le côté faible.",
+       alt:"Machine développé épaules à bras indépendants, ou développé haltère un bras assis avec dossier."},
+      {id:"a3",n:"Écarté poulie vis-à-vis (haut vers bas)",m:"Pecs",sets:3,lo:12,hi:15,rest:60,
+       cue:"Poulies réglées haut, tu ramènes vers le bas du sternum. Coudes légèrement fléchis et FIXES. Une seconde de contraction au centre. C'est l'étirement en position ouverte qui fait le boulot, ne raccourcis pas l'amplitude.",
+       alt:"Pec-deck."},
+      {id:"a4",n:"Élévations latérales haltères",m:"Deltoïde latéral",sets:4,lo:12,hi:20,rest:45,
+       cue:"L'exercice n°1 de ton objectif : c'est lui qui donne la largeur d'épaules. Léger, propre, buste très légèrement penché en avant. Monte jusqu'à l'horizontale, descends en 2 secondes. Si tu balances le corps, le poids est trop lourd. Regarde-toi de face dans le miroir : si un bras monte plus haut que l'autre, baisse la charge jusqu'à ce que les deux soient identiques.",
+       alt:"Élévations à la poulie basse (encore mieux, tension constante)."},
+      {id:"a5",n:"Extension triceps poulie haute (corde)",m:"Triceps",sets:3,lo:10,hi:15,rest:45,
+       cue:"Coudes collés au corps et immobiles. Écarte la corde en fin de mouvement. Contrôle la remontée.",
+       alt:"Barre droite si la corde est prise."}
+    ]
+  },
+  B:{
+    key:"B", name:"TIRAGE", sub:"Dos · Biceps · Arrière d'épaules",
+    focus:"Le dos, c'est ce qui te fait paraître large de face ET de dos. Ne le néglige pas.",
+    ex:[
+      {id:"b1",n:"Tirage vertical prise large",m:"Grand dorsal",sets:4,lo:8,hi:12,rest:120,
+       cue:"Prise un peu plus large que les épaules. Tire avec les COUDES vers les hanches, pas avec les mains. Léger recul du buste (~15°), poitrine sortie. Tu ramènes la barre à la clavicule, pas derrière la nuque.",
+       alt:"Tractions assistées à la machine."},
+      {id:"b2",n:"Rowing unilatéral (machine buste appuyé, un bras)",m:"Milieu du dos",sets:3,lo:8,hi:12,rest:90,uni:true,
+       cue:"<b>L'exercice le plus important de ton programme.</b> Buste calé sur le support, une main à la fois. Chaque omoplate suit sa propre trajectoire au lieu d'être forcée dans un schéma symétrique que ta cage thoracique ne peut pas produire. Laisse l'omoplate s'étirer complètement en avant, puis tire jusqu'au bas des côtes. Commence toujours par le côté faible et n'accorde pas au côté fort une seule rep de plus.",
+       alt:"Rowing haltère un bras, main et genou opposés sur le banc."},
+      {id:"b3",n:"Pull-over poulie haute à genoux (bras tendus)",m:"Grand dorsal",sets:2,lo:12,hi:15,rest:45,
+       cue:"À genoux face à la poulie plutôt que debout penché : le bassin est stable et le bas du dos ne travaille pas en flexion. Bras quasi tendus, tu abaisses la corde vers les cuisses. Isole le dorsal sans les biceps.",
+       alt:"Straight-arm pulldown assis."},
+      {id:"b4",n:"Face pull poulie haute",m:"Arrière d'épaules / trapèzes inférieurs",sets:4,lo:15,hi:20,rest:45,
+       cue:"<b>Passé de 3 à 4 séries à cause de ton omoplate.</b> Corde à hauteur du visage, tu tires vers le front en écartant, coudes HAUTS, et tu termines en abaissant activement les omoplates vers les poches arrière. C'est le meilleur travail de trapèze inférieur disponible, et le trapèze inférieur est le muscle qui plaque l'omoplate contre les côtes. Toujours léger, toujours propre.",
+       alt:"Oiseau à la poulie ou reverse pec-deck."},
+      {id:"b5",n:"SUPERSET — Curl incliné haltères",m:"Biceps (long chef)",sets:3,lo:10,hi:12,rest:0,
+       cue:"Banc à 45-60°, bras qui pendent DERRIÈRE le corps : c'est cette position étirée qui fait grossir le biceps en volume. Enchaîne directement sur le curl marteau, sans repos.",
+       alt:"Curl barre EZ."},
+      {id:"b6",n:"SUPERSET — Curl marteau",m:"Brachial / avant-bras",sets:3,lo:12,hi:15,rest:60,
+       cue:"Directement après le curl incliné, puis 60 s de repos avant de recommencer. Le brachial passe SOUS le biceps : le développer pousse le biceps vers le haut et épaissit le bras vu de profil. Prise neutre stricte.",
+       alt:"Curl à la corde poulie basse."}
+    ]
+  },
+  C:{
+    key:"C", name:"LARGEUR", sub:"Jambes (minimum) · Épaules · Bras",
+    focus:"Le strict minimum pour les jambes (sinon tu auras l'air déséquilibré), puis on repasse une couche sur ce qui compte pour toi.",
+    ex:[
+      {id:"c1",n:"Presse à cuisses",m:"Quadriceps / fessiers",sets:3,lo:10,hi:15,rest:120,
+       cue:"Pieds à mi-plateau, largeur d'épaules. Ta radio ne montre ni bascule de bassin ni inégalité de jambes : cet exercice ne pose aucun problème chez toi, tu peux charger normalement. Seule règle, valable pour tout le monde : tu t'arrêtes dès que le bassin s'enroule et que le bas du dos décolle du dossier. Zéro squat barre sur le dos et zéro soulevé de terre dans ce programme, c'est délibéré.",
+       alt:"Presse unilatérale une jambe à la fois si tu sens une nette différence gauche/droite."},
+      {id:"c2",n:"Leg curl allongé ou assis",m:"Ischio-jambiers",sets:2,lo:12,hi:15,rest:45,
+       cue:"Deux séries, non négociables : c'est l'assurance genou/dos la moins chère du monde.",
+       alt:"Soulevé de terre roumain haltères."},
+      {id:"c3",n:"Développé machine convergente, un bras à la fois",m:"Pecs",sets:3,lo:8,hi:12,rest:90,uni:true,
+       cue:"<b>Remplace le développé couché à plat, qui est le pire cas de figure pour toi :</b> le banc impose une position symétrique que ta cage thoracique ne peut pas prendre, d'où tes sensations différentes à gauche et à droite. Assis avec le dos calé, un bras à la fois, chaque côté charge indépendamment et tu peux enfin comparer honnêtement. Commence par le côté faible.",
+       alt:"Développé haltère un bras allongé, ou pec-deck unilatéral."},
+      {id:"c4",n:"Élévations latérales à la poulie (unilatéral)",m:"Deltoïde latéral",sets:4,lo:12,hi:15,rest:45,uni:true,
+       cue:"Poulie basse, câble qui passe devant le corps, tu montes de côté. Tension constante du début à la fin, bien supérieure à l'haltère. C'est le rappel qui construit ta largeur.",
+       alt:"Élévations haltères en drop set."},
+      {id:"c5",n:"SUPERSET — Extension triceps au-dessus de la tête",m:"Triceps (long chef)",sets:3,lo:12,hi:15,rest:0,
+       cue:"Enchaîne directement avec le curl poulie sans repos. La position bras au-dessus de la tête étire le long chef du triceps : c'est la portion qui donne le volume au bras vu de dos.",
+       alt:"Extension haltère 2 mains derrière la nuque."},
+      {id:"c6",n:"SUPERSET — Curl poulie basse",m:"Biceps",sets:3,lo:12,hi:15,rest:60,
+       cue:"Directement après le triceps, puis 60 s de repos avant de recommencer le superset. Amplitude complète, pas de balancier.",
+       alt:"Curl haltères debout."}
+    ]
+  }
+};
+
+const ORDER = ["A","B","C"];
+
+const WARMUP = [
+  "3 min de rameur ou vélo, rythme facile — juste pour monter la température.",
+  "<b>Glissements au mur × 10.</b> Dos au mur, avant-bras contre le mur, tu montes et descends les bras en gardant le contact. Réveille les trapèzes inférieurs et le dentelé antérieur, les deux muscles qui plaquent l'omoplate contre les côtes.",
+  "<b>Dentelé antérieur × 10 par bras.</b> À la poulie basse ou en pompe contre un mur : bras tendu devant, tu pousses l'épaule le plus loin possible vers l'avant, tu tiens 1 seconde. Insiste à droite, du côté de la gibbosité.",
+  "<b>Respiration dérotatrice × 8.</b> Assis bien droit, une main sur les côtes gauches. Tu inspires lentement par le nez en cherchant à gonfler <i>uniquement</i> le côté gauche du thorax, celui qui est concave et qui s'ouvre mal, puis tu expires en grandissant la colonne vers le plafond. C'est un emprunt à la méthode Schroth : ça ne redresse rien, mais ça entretient la mobilité de la cage du côté fermé.",
+  "10 rotations d'épaules en arrière + 10 dislocations avec un élastique ou un bâton.",
+  "Premier exercice : 1 série à vide × 10, puis 1 série à ~60 % du poids de travail × 5. Ce sont des séries d'échauffement, tu ne les notes PAS.",
+  "Pour les exercices suivants : 1 série légère suffit, ou zéro si le muscle est déjà chaud."
+];
+
+/* ══════════════════════════════════════════
+   2. NUTRITION
+   ══════════════════════════════════════════ */
+
+const NUTRI = {
+  kcal:2700, prot:140, lip:85, gluc:360,
+  day:[
+    {t:"Petit-déjeuner",k:"≈ 700 kcal · 40 g P",
+     d:"80 g de flocons d'avoine + 350 ml de lait entier + 30 g de whey ou 250 g de skyr + 1 banane + 20 g de beurre de cacahuète. Se prépare la veille (overnight oats) si tu es pressé le matin."},
+    {t:"Déjeuner (le tien, ajusté)",k:"≈ 800 kcal · 50 g P",
+     d:"Ta salade quinoa/boulgour + double portion poulet ou thon. Deux ajouts obligatoires : augmente la base de céréales à ~200 g cuits, et ajoute 30 g d'amandes ou un demi-avocat. Sans ça ton déjeuner tourne autour de 550 kcal et tu ne prendras rien."},
+    {t:"Collation (16 h ou post-séance)",k:"≈ 400 kcal · 30 g P",
+     d:"250 g de skyr + 40 g de miel ou de fruits secs. Ou 2 tranches de pain complet + 40 g de fromage + un fruit. Non négociable les jours d'entraînement."},
+    {t:"Dîner",k:"≈ 800 kcal · 45 g P",
+     d:"Voir les 8 recettes ci-dessous. Toutes tiennent en 30 minutes, toutes dépassent 45 g de protéines."}
+  ],
+  meals:[
+    {n:"Saumon rôti, patate douce, brocolis",k:850,p:48,t:"25 min",
+     ing:["200 g de pavé de saumon","350 g de patate douce","200 g de brocolis","1 c.à.s d'huile d'olive","Miel, sauce soja, ail"],
+     st:["Four à 200 °C. Patate douce en cubes, huile + sel, 20 min.","À 10 min de la fin, ajoute le saumon sur la plaque, glacé miel/soja/ail.","Brocolis vapeur 6 min."]},
+    {n:"Bol bœuf haché, riz, légumes poêlés",k:880,p:52,t:"20 min",
+     ing:["200 g de bœuf haché 5 %","100 g de riz cru","1 poivron + 1 oignon","Sauce soja, gingembre, ail, sésame","1 œuf (optionnel)"],
+     st:["Riz au cuiseur ou casserole.","Fais revenir oignon + poivron 5 min à feu vif.","Ajoute le bœuf, écrase-le, 6 min. Soja + gingembre + ail.","Sers sur le riz, œuf au plat par-dessus."]},
+    {n:"Pâtes complètes, poulet, tomate-parmesan",k:900,p:55,t:"20 min",
+     ing:["120 g de pâtes complètes crues","200 g de blanc de poulet","300 g de passata","30 g de parmesan","Ail, basilic, huile d'olive"],
+     st:["Pâtes à l'eau bouillante salée.","Poulet en lanières, poêle bien chaude, 7 min.","Ajoute la passata + ail, mijote 5 min.","Mélange, parmesan par-dessus."]},
+    {n:"Omelette 4 œufs, pommes de terre sautées",k:820,p:45,t:"20 min",
+     ing:["4 œufs entiers + 2 blancs","400 g de pommes de terre","60 g d'emmental","Salade verte","Huile d'olive"],
+     st:["Pommes de terre en dés, poêle 12 min à couvert puis à découvert.","Bats les œufs, verse dans une seconde poêle à feu doux.","Fromage au centre, plie, sers avec la salade."]},
+    {n:"Curry poulet-pois chiches, riz basmati",k:870,p:50,t:"25 min",
+     ing:["180 g de poulet","150 g de pois chiches égouttés","100 g de riz basmati cru","150 ml de lait de coco","Curry, tomate concassée, oignon"],
+     st:["Riz en cuisson.","Oignon + poulet en dés, 6 min.","Ajoute curry, tomate, pois chiches, lait de coco. Mijote 12 min."]},
+    {n:"Chili con carne express",k:840,p:50,t:"25 min",
+     ing:["200 g de bœuf haché 5 %","150 g de haricots rouges","200 g de tomate concassée","90 g de riz cru","Cumin, paprika, oignon"],
+     st:["Riz en cuisson.","Oignon puis bœuf à feu vif 6 min.","Épices, tomate, haricots. Mijote 12 min à couvert.","Sers sur le riz."]},
+    {n:"Cabillaud, purée maison, haricots verts",k:790,p:47,t:"25 min",
+     ing:["220 g de cabillaud ou lieu","400 g de pommes de terre","200 g de haricots verts","30 g de beurre + un filet de lait","Citron, ail"],
+     st:["Pommes de terre à l'eau 18 min, écrase avec beurre et lait.","Poisson à la poêle 4 min par face, citron + ail.","Haricots verts vapeur ou poêlés."]},
+    {n:"Poêlée dinde, patate douce, avocat",k:860,p:52,t:"20 min",
+     ing:["220 g d'escalope de dinde","300 g de patate douce","1/2 avocat","Épinards frais","Paprika fumé, huile d'olive"],
+     st:["Patate douce en cubes, poêle 14 min à couvert.","Dinde en lanières dans une autre poêle, 6 min, paprika.","Épinards 1 min, avocat en tranches par-dessus."]}
+  ],
+  lazy:"Jour de flemme assumé : 300 g de pâtes cuites + 2 boîtes de thon + huile d'olive + parmesan. 4 minutes, 55 g de protéines. Ou 4 œufs brouillés + 4 tranches de pain complet + fromage. Un dîner médiocre mangé bat un dîner parfait sauté.",
+  rules:[
+    "<b>Pèse-toi le matin à jeun, 3 fois par semaine.</b> Ce que tu suis, c'est la moyenne hebdo, pas le chiffre du jour. Objectif : +0,25 à +0,4 kg par semaine. Plus vite = tu prends du gras.",
+    "<b>Si le poids stagne 2 semaines de suite, ajoute 300 kcal.</b> Le plus simple : +60 g d'avoine au petit-déj ou une deuxième collation. C'est le levier n°1 et c'est là que la plupart des gens échouent.",
+    "<b>140 g de protéines par jour, minimum.</b> En dessous, l'entraînement ne sert pas à grand-chose. Répartis sur 4 prises plutôt que 2 grosses.",
+    "<b>Ne compte pas les calories à vie.</b> Fais-le 2 semaines pour calibrer tes portions, puis pilote uniquement à la balance et au miroir.",
+    "<b>Alcool :</b> chaque soirée arrosée coûte à peu près 2 jours de progression. Ça ne veut pas dire zéro, ça veut dire que tu sais ce que ça coûte."
+  ]
+};
+
+/* ══════════════════════════════════════════
+   3. STOCKAGE
+   ══════════════════════════════════════════ */
+
+const KEY="forge_v1";
+let mem=null, storageOK=true;
+function load(){
+  try{ const r=localStorage.getItem(KEY); return r?JSON.parse(r):blank(); }
+  catch(e){ storageOK=false; return mem||blank(); }
+}
+function blank(){ return {logs:[], bw:[], active:null, start:null}; }
+function save(){
+  try{ localStorage.setItem(KEY,JSON.stringify(S)); }
+  catch(e){ storageOK=false; mem=S; }
+}
+let S=load();
+
+/* ══════════════════════════════════════════
+   4. HELPERS
+   ══════════════════════════════════════════ */
+
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+const allEx=()=>ORDER.flatMap(k=>PROGRAM[k].ex);
+const exById=id=>allEx().find(e=>e.id===id);
+function fdate(d){ return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short"}); }
+function daysAgo(d){ return Math.round((new Date(today())-new Date(d))/864e5); }
+
+function nextKey(){
+  if(!S.logs.length) return "A";
+  const last=S.logs[S.logs.length-1].key;
+  return ORDER[(ORDER.indexOf(last)+1)%3];
+}
+function weekNo(){
+  if(!S.start) return 1;
+  return Math.floor((new Date(today())-new Date(S.start))/(7*864e5))+1;
+}
+function isDeload(){ const w=weekNo(); return w===7||w===14; }
+
+// dernière perf enregistrée pour un exercice
+function lastPerf(exId){
+  for(let i=S.logs.length-1;i>=0;i--){
+    const s=S.logs[i].sets[exId];
+    if(s&&s.length&&s.some(x=>x.w)) return {sets:s.filter(x=>x.w),date:S.logs[i].date};
+  }
+  return null;
+}
+function bestOf(exId){
+  let b=0,br=0;
+  S.logs.forEach(l=>(l.sets[exId]||[]).forEach(s=>{
+    const w=parseFloat(s.w)||0; if(w>b){b=w;br=parseInt(s.r)||0;}
+  }));
+  return b?{w:b,r:br}:null;
+}
+// conseil de progression : monter le poids ?
+function verdict(ex){
+  const lp=lastPerf(ex.id);
+  if(!lp) return {txt:"Première fois : choisis un poids où tu t'arrêtes à 2 reps de l'échec sur "+ex.lo+"-"+ex.hi+" reps.",cls:""};
+  const reps=lp.sets.map(s=>parseInt(s.r)||0);
+  const w=lp.sets[0].w;
+  if(reps.length>=ex.sets-1 && reps.every(r=>r>=ex.hi))
+    return {txt:"Tu as validé "+ex.hi+" reps partout à "+w+" kg → monte à "+(+w+2.5)+" kg cette fois.",cls:"acc"};
+  if(reps.some(r=>r<ex.lo))
+    return {txt:"Tu es tombé sous "+ex.lo+" reps la dernière fois → garde "+w+" kg et vise "+ex.lo+"+ sur toutes les séries.",cls:"warn"};
+  return {txt:"Reste à "+w+" kg et ajoute au moins 1 rep sur une série. C'est ça, progresser.",cls:""};
+}
+
+function bwTrend(){
+  if(S.bw.length<2) return null;
+  const s=[...S.bw].sort((a,b)=>a.d<b.d?-1:1);
+  const last=s[s.length-1];
+  const ref=s.filter(x=>daysAgo(x.d)>=12);
+  if(!ref.length) return {cur:last.kg,delta:null};
+  const r=ref[ref.length-1];
+  const days=(new Date(last.d)-new Date(r.d))/864e5;
+  return {cur:last.kg, delta:+(last.kg-r.kg).toFixed(1), perWk:+(((last.kg-r.kg)/days)*7).toFixed(2)};
+}
+
+/* ══════════════════════════════════════════
+   5. COACH ADAPTATIF
+   ══════════════════════════════════════════ */
+
+function coach(){
+  const out=[];
+  const n=S.logs.length;
+  const t=bwTrend();
+
+  if(n===0){
+    out.push("On commence par la <b>Séance A — Poussée</b>. Ton seul objectif aujourd'hui : noter des chiffres. Choisis des poids où tu t'arrêtes à 2 reps de l'échec. La semaine 1 ne sert qu'à calibrer.");
+    return out;
+  }
+
+  const last=S.logs[S.logs.length-1];
+  const gap=daysAgo(last.date);
+  if(gap>=8) out.push("<b>"+gap+" jours sans séance.</b> Reprends à ~90 % de tes derniers poids sur la première séance, puis reviens au niveau normal. Ne repars pas de zéro, tu n'as rien perdu.");
+  else if(gap>=4) out.push(gap+" jours depuis la dernière séance. Tu es sur 2 séances/semaine plutôt que 3 : c'est encore utile, mais tu progresseras environ 30 % moins vite.");
+
+  if(isDeload()) out.push("<b>Semaine "+weekNo()+" = décharge.</b> Fais les mêmes exercices avec les mêmes poids mais divise le nombre de séries par deux. Ça n'est pas du temps perdu, c'est ce qui te permet de repartir plus fort.");
+
+  if(t&&t.delta!==null){
+    if(t.perWk<0.1) out.push("<b>Ton poids ne monte pas ("+(t.delta>=0?"+":"")+t.delta+" kg sur 2 semaines).</b> C'est ton frein n°1, pas l'entraînement. Ajoute 300 kcal par jour : le plus simple, c'est 60 g d'avoine en plus le matin ou une deuxième collation.");
+    else if(t.perWk>0.6) out.push("Tu prends "+t.perWk+" kg/semaine, c'est trop rapide — une bonne partie sera du gras. Réduis d'environ 200 kcal par jour.");
+    else out.push("Poids corporel : "+t.cur+" kg, "+(t.perWk>0?"+":"")+t.perWk+" kg/semaine. <b>C'est exactement le bon rythme</b>, ne change rien.");
+  } else if(S.bw.length<2){
+    out.push("Enregistre ton poids dans l'onglet Progrès. Sans ça je ne peux pas te dire si tu manges assez — et à 66 kg pour 1m76, c'est probablement le vrai sujet.");
+  }
+
+  // exercice qui stagne
+  const stuck=allEx().map(e=>{
+    const ws=S.logs.filter(l=>l.sets[e.id]&&l.sets[e.id].some(s=>s.w)).slice(-4)
+      .map(l=>Math.max(...l.sets[e.id].map(s=>parseFloat(s.w)||0)));
+    return {e,ws};
+  }).find(x=>x.ws.length>=4 && Math.max(...x.ws)<=x.ws[0]);
+  if(stuck) out.push("<b>"+stuck.e.n+"</b> stagne depuis 4 séances. Deux options : baisse de 10 % et remonte proprement sur 3 séances, ou remplace-le par sa variante ("+stuck.e.alt+").");
+
+  if(out.length===0){
+    const k=nextKey();
+    out.push("Prochaine séance : <b>"+PROGRAM[k].name+"</b>. "+PROGRAM[k].focus);
+  }
+  return out;
+}
+
+/* ══════════════════════════════════════════
+   6. TIMER DE REPOS
+   ══════════════════════════════════════════ */
+
+let restLeft=0, restInt=null;
+function startRest(s){
+  restLeft=s; $("timer").classList.add("show"); paintRest();
+  clearInterval(restInt);
+  restInt=setInterval(()=>{
+    restLeft--; paintRest();
+    if(restLeft<=0){ stopRest(); beep(); }
+  },1000);
+}
+function paintRest(){
+  const m=Math.floor(Math.max(restLeft,0)/60), s=Math.max(restLeft,0)%60;
+  $("tval").textContent=m+":"+String(s).padStart(2,"0");
+}
+function addRest(d){ restLeft=Math.max(5,restLeft+d); paintRest(); }
+function stopRest(){ clearInterval(restInt); $("timer").classList.remove("show"); }
+function beep(){
+  try{
+    if(navigator.vibrate) navigator.vibrate([220,90,220]);
+    const c=new (window.AudioContext||window.webkitAudioContext)();
+    [0,.22].forEach(t=>{
+      const o=c.createOscillator(), g=c.createGain();
+      o.frequency.value=880; o.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(.18,c.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.18);
+      o.start(c.currentTime+t); o.stop(c.currentTime+t+.19);
+    });
+  }catch(e){}
+}
+
+/* ══════════════════════════════════════════
+   7. VUES
+   ══════════════════════════════════════════ */
+
+let tab="home";
+
+const ICONS={
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  prog:'<path d="M4 7h16M4 12h16M4 17h10"/>',
+  stats:'<path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5M12 16V8M16 16v-8"/>',
+  food:'<path d="M6 3v8a3 3 0 0 0 6 0V3"/><path d="M9 11v10"/><path d="M18 3c-1.5 2-2 4-2 6s.5 3 2 3v9"/>'
+};
+function navBar(){
+  const items=[["home","Accueil","home"],["prog","Programme","prog"],["stats","Progrès","stats"],["food","Nutrition","food"]];
+  $("nav").innerHTML=items.map(([k,l,i])=>
+    `<button class="${tab===k?'on':''}" onclick="go('${k}')">
+      <svg viewBox="0 0 24 24">${ICONS[i]}</svg><span>${l}</span></button>`).join("");
+}
+function go(t){ tab=t; render(); window.scrollTo(0,0); }
+
+/* ---------- ACCUEIL ---------- */
+function vHome(){
+  const k=nextKey(), p=PROGRAM[k];
+  const t=bwTrend();
+  const thisWk=S.logs.filter(l=>daysAgo(l.date)<7).length;
+  const tot=S.logs.length;
+  const totalKg=S.logs.reduce((a,l)=>a+Object.values(l.sets).flat()
+    .reduce((b,s)=>b+((parseFloat(s.w)||0)*(parseInt(s.r)||0)),0),0);
+
+  return `
+  <div class="topbar">
+    <div><div class="eyebrow">Semaine ${weekNo()} · ${S.start?"programme lancé":"pas encore commencé"}</div>
+    <div class="h1">Salut Victor</div></div>
+    <div class="chip ${thisWk>=3?'ok':''}">${thisWk}/3 cette semaine</div>
+  </div>
+  <div class="wrap">
+    ${!storageOK?`<div class="banner">Ton navigateur bloque la sauvegarde locale. Ouvre ce fichier depuis un vrai navigateur (ou héberge-le) pour que ton historique soit conservé. En attendant, tes données restent en mémoire jusqu'à la fermeture de l'onglet.</div>`:""}
+    ${S.active?`<div class="card" style="border-color:rgba(216,255,62,.35);background:rgba(216,255,62,.06)">
+      <div class="between">
+        <div><div class="eyebrow" style="color:var(--acc)">Séance en cours</div>
+        <div style="font-weight:750;font-size:15px;margin-top:2px">${PROGRAM[S.active.key].name}</div></div>
+        <button class="btn sm" onclick="go('session')">Reprendre</button>
+      </div></div>`:""}
+
+    <div class="coach">
+      <div class="t">Le coach dit</div>
+      ${coach().map(c=>`<p>${c}</p>`).join("")}
+    </div>
+
+    <div class="sesshero">
+      <span class="tag">Séance ${k}</span>
+      <div style="height:12px"></div>
+      <div class="h1" style="font-size:30px">${p.name}</div>
+      <div class="dim" style="font-size:14px;margin-top:2px">${p.sub}</div>
+      <div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
+        <span class="chip">${p.ex.length} exercices</span>
+        <span class="chip">${p.ex.reduce((a,e)=>a+e.sets,0)} séries</span>
+        <span class="chip">≈ 45 min</span>
+        ${isDeload()?`<span class="chip warn">Décharge</span>`:""}
+      </div>
+      <div style="height:18px"></div>
+      <button class="btn" onclick="beginSession('${k}')">Démarrer la séance</button>
+      <div style="height:8px"></div>
+      <div class="row" style="gap:8px">
+        ${ORDER.filter(x=>x!==k).map(x=>`<button class="btn ghost sm" style="flex:1" onclick="beginSession('${x}')">Faire ${PROGRAM[x].name}</button>`).join("")}
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="stat"><div class="v num">${tot}</div><div class="k">Séances</div></div>
+      <div class="stat"><div class="v num">${t?t.cur:"—"}<span style="font-size:13px;color:var(--dim)">${t?" kg":""}</span></div><div class="k">Poids actuel</div></div>
+      <div class="stat"><div class="v num">${(totalKg/1000).toFixed(1)}<span style="font-size:13px;color:var(--dim)"> t</span></div><div class="k">Volume soulevé</div></div>
+    </div>
+
+    <div class="sp"></div>
+    <details>
+      <summary>Les 5 règles qui font 90 % du résultat</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span><b>Progresse ou rien.</b> Chaque séance, tu dois battre la précédente sur au moins un exercice : soit +2,5 kg, soit +1 rep. Sans ça, ton corps n'a aucune raison de fabriquer du muscle.</span></li>
+          <li><span class="dot"></span><span><b>Arrête-toi à 1-2 reps de l'échec.</b> Trop facile = pas de stimulus. Systématiquement à l'échec = tu récupères mal. La bonne zone : tu pourrais encore en faire 1 ou 2, pas plus.</span></li>
+          <li><span class="dot"></span><span><b>Contrôle la descente.</b> 2 secondes en excentrique, explosif en concentrique. C'est gratuit et ça double la qualité de chaque série.</span></li>
+          <li><span class="dot"></span><span><b>Mange plus que ce que tu crois.</b> À 66 kg pour 1m76, l'entraînement n'est pas ton facteur limitant. La fourchette l'est.</span></li>
+          <li><span class="dot"></span><span><b>7 à 8 h de sommeil.</b> C'est là que le muscle se construit, pas à la salle. Une nuit de 5 h annule une bonne partie de la séance de la veille.</span></li>
+          <li><span class="dot"></span><span><b>Sur les exercices unilatéraux : commence par le côté faible, et le côté fort ne fait pas une rep de plus.</b> C'est ta règle personnelle, celle qui empêche ton asymétrie de s'aggraver. Détails dans l'onglet Programme.</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Ce qui va se passer, et quand</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span><b>Semaines 1-3 :</b> tes charges montent vite. C'est du système nerveux, pas encore du muscle. Ne te fais pas d'illusions et ne t'emballe pas.</span></li>
+          <li><span class="dot"></span><span><b>Semaines 4-8 :</b> premiers changements visibles, surtout sur les épaules et le haut des pecs. Ton t-shirt tombe différemment.</span></li>
+          <li><span class="dot"></span><span><b>Mois 3-6 :</b> c'est là que ça devient évident pour les autres. +3 à 5 kg sur la balance, largeur d'épaules nettement supérieure.</span></li>
+          <li><span class="dot"></span><span><b>Le vrai risque n'est pas le programme, c'est l'abandon en semaine 5-6</b>, quand la nouveauté est passée et que les résultats ne sont pas encore là. Prépare-toi mentalement à ce creux : il arrive toujours.</span></li>
+        </ul>
+      </div>
+    </details>
+    <div class="sp24"></div>
+  </div>`;
+}
+
+/* ---------- PROGRAMME ---------- */
+let progTab="A";
+function vProg(){
+  const p=PROGRAM[progTab];
+  return `
+  <div class="topbar"><div><div class="eyebrow">3 séances · 45 min · haut du corps</div><div class="h1">Programme</div></div></div>
+  <div class="wrap">
+    <div class="pillbar">
+      ${ORDER.map(k=>`<button class="${progTab===k?'on':''}" onclick="progTab='${k}';render()">${PROGRAM[k].name}</button>`).join("")}
+    </div>
+    <div class="card">
+      <div class="h2">Séance ${p.key} — ${p.name}</div>
+      <div class="dim" style="font-size:13px;margin-top:4px">${p.focus}</div>
+    </div>
+    ${p.ex.map((e,i)=>`
+      <details>
+        <summary><span style="flex:1"><span class="dim num" style="margin-right:8px">${i+1}</span>${e.n}</span>
+          <span class="chip" style="flex:0 0 auto">${e.sets}×${e.lo}-${e.hi}</span></summary>
+        <div class="inner">
+          <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:11px">
+            <span class="chip acc">${e.m}</span><span class="chip">Repos ${e.rest?e.rest+" s":"enchaîné"}</span>
+            ${e.uni?`<span class="chip warn">Unilatéral</span>`:""}
+          </div>
+          <div class="cue">${e.cue}</div>
+          <div style="height:9px"></div>
+          <div class="dim" style="font-size:12px"><b style="color:var(--txt)">Si occupé :</b> ${e.alt}</div>
+        </div>
+      </details>`).join("")}
+
+    <div class="sp"></div>
+    <details>
+      <summary>Ta scoliose : 36° dorsale, convexité droite</summary>
+      <div class="inner">
+        <div class="hint" style="margin-bottom:13px">
+          <b>Téléradiographie du 06/06/2019 (Pr Boyer, CIMI Paris 13) :</b> scoliose dorsale à concavité gauche avec rotation des corps vertébraux, <b>36° selon Lippmann-Cobb</b>. Pas d'anomalie morphologique vertébrale. Pas de trouble statique sagittal. Pas de bascule du bassin. Pas d'inégalité de longueur des membres inférieurs.
+        </div>
+        <ul class="li">
+          <li><span class="dot"></span><span><b>36°, ce n'est pas une petite scoliose.</b> On parle de scoliose au-delà de 10°, de courbure modérée à partir de 25°, et la discussion chirurgicale commence vers 45-50°. Tu es dans le haut de la zone modérée. Ça ne t'interdit rien de ce qui est dans ce programme, mais ça justifie chacune des adaptations qui y ont été faites.</span></li>
+          <li><span class="dot"></span><span><b>Concavité gauche = convexité droite = gibbosité à droite.</b> Le compte-rendu explique exactement ce que tu décris : la rotation vertébrale entraîne les côtes droites vers l'arrière, ce qui fait ressortir ton omoplate droite. Devant, c'est l'inverse — le thorax droit s'aplatit légèrement, d'où ton impression d'asymétrie sur les pectoraux. Tu n'imagines rien.</span></li>
+          <li><span class="dot"></span><span><b>La radio date de 2019, tu avais 19 ans. Refais-en une.</b> Les courbures dorsales dépassant 30° à maturité osseuse progressent en moyenne de 0,5 à 1° par an à l'âge adulte. Sur sept ans, ça peut représenter quelques degrés — ou rien du tout. Une nouvelle téléradiographie te donne la seule information qui compte vraiment : est-ce que ça bouge ou pas. Ça se demande à un médecin généraliste en cinq minutes.</span></li>
+          <li><span class="dot"></span><span><b>Bonne nouvelle sur le bas du corps :</b> pas de bascule de bassin, pas d'inégalité de longueur de jambes, pas de trouble sagittal. Le problème est confiné à l'étage dorsal. La presse à cuisses ne pose donc aucun souci, et tu n'as pas besoin de talonnette ni de correction quelconque.</span></li>
+          <li><span class="dot"></span><span><b>À 36° avec rotation, un kiné formé à la méthode Schroth vaut le détour</b>, même sans douleur. C'est la seule approche rééducative qui a des données correctes sur les courbures modérées de l'adulte : travail respiratoire de dérotation et autograndissement. Quelques séances pour apprendre, puis 10 min par jour chez toi. Ça ne remplace pas la musculation, ça se cumule.</span></li>
+          <li><span class="dot"></span><span><b>La musculation n'aggrave pas une scoliose idiopathique.</b> Aucune donnée sérieuse ne le montre, y compris à ce niveau de courbure. Ce qui pose problème, c'est la compression axiale lourde et la flexion lombaire sous charge : squat barre sur le dos, soulevé de terre, rowing barre penché, développé militaire debout. Aucun n'est dans ce programme, et ce n'est pas un hasard.</span></li>
+          <li><span class="dot"></span><span><b>Ta gibbosité ne partira pas avec l'entraînement.</b> C'est de l'os en rotation, pas du muscle. Aucun exercice ne dérotate une vertèbre. Ce que le muscle peut faire, c'est combler autour et rendre l'asymétrie nettement moins lisible — à 66 kg tu n'as presque rien pour la masquer, à 73 kg ce sera très différent. C'est réel, mais ce n'est pas une correction.</span></li>
+          <li><span class="dot"></span><span><b>Le vrai risque à l'entraînement, c'est que ton côté fort creuse l'écart.</b> Sur un exercice à deux bras, le côté dominant prend automatiquement plus de charge, mois après mois. D'où les quatre exercices unilatéraux, et d'où la règle qui suit.</span></li>
+          <li><span class="dot"></span><span><b>La règle du côté faible, sans exception :</b> tu commences la série par le côté faible, tu vas jusqu'à 1-2 reps de l'échec, et tu fais <b>exactement le même nombre de reps</b> de l'autre côté, même s'il pourrait en faire quatre de plus. C'est frustrant. C'est aussi la seule chose qui empêche l'écart de grandir.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details><summary>Échauffement (6 min, non négociable)</summary>
+      <div class="inner"><ol class="ol">${WARMUP.map(w=>`<li>${w}</li>`).join("")}</ol></div>
+    </details>
+    <details><summary>Comment charger la barre (double progression)</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span>Chaque exercice a une fourchette, par exemple <b>4 × 6-10</b>.</span></li>
+          <li><span class="dot"></span><span>Tu choisis un poids où tu atteins le <b>bas</b> de la fourchette en t'arrêtant à 1-2 reps de l'échec.</span></li>
+          <li><span class="dot"></span><span>Séance après séance, tu ajoutes des <b>reps</b> avec le même poids, jusqu'à atteindre le haut de la fourchette sur toutes les séries.</span></li>
+          <li><span class="dot"></span><span>Là seulement tu montes le poids : <b>+2,5 kg</b> sur les gros exercices, <b>+1 à 2 kg</b> sur l'isolation. Tu retombes en bas de la fourchette, et tu recommences.</span></li>
+          <li><span class="dot"></span><span>L'app te dit quoi faire à chaque exercice pendant la séance. Tu n'as rien à calculer.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details><summary>Organisation de la semaine</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span><b>Rotation A → B → C → A</b>, dans l'ordre, sans te soucier des jours fixes. Si tu sautes une semaine, tu reprends où tu en étais.</span></li>
+          <li><span class="dot"></span><span>Idéal : <b>lundi / mercredi / vendredi</b> ou <b>mardi / jeudi / samedi</b>. Au moins un jour de repos entre deux séances.</span></li>
+          <li><span class="dot"></span><span><b>Semaines 7 et 14 : décharge.</b> Mêmes exercices, mêmes poids, moitié moins de séries. L'app te le rappellera.</span></li>
+          <li><span class="dot"></span><span>Deux séances valent mieux qu'aucune. <b>Ne saute jamais deux semaines d'affilée</b> — c'est là que les gens ne reviennent plus.</span></li>
+          <li><span class="dot"></span><span><b>Si tu dépasses 45 min :</b> coupe la dernière série du dernier exercice, puis de l'avant-dernier. Jamais le premier exercice de la séance, c'est celui qui compte le plus. Les séances B et C sont les plus chargées à cause du travail unilatéral.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details><summary>Volume hebdomadaire par muscle</summary>
+      <div class="inner">
+        <table>
+          <tr><th>Muscle</th><th style="text-align:right">Séries/sem.</th><th style="text-align:right">Zone utile</th></tr>
+          <tr><td>Deltoïde latéral</td><td class="n">11</td><td class="n dim">10-20</td></tr>
+          <tr><td>Pectoraux</td><td class="n">10</td><td class="n dim">10-20</td></tr>
+          <tr><td>Dos</td><td class="n">9</td><td class="n dim">10-20</td></tr>
+          <tr><td>Biceps</td><td class="n">9</td><td class="n dim">6-15</td></tr>
+          <tr><td>Triceps</td><td class="n">6 + indirect</td><td class="n dim">6-15</td></tr>
+          <tr><td>Arrière d'épaules / trap. inf.</td><td class="n">4 + indirect</td><td class="n dim">4-10</td></tr>
+          <tr><td>Jambes</td><td class="n">5</td><td class="n dim">8-16</td></tr>
+        </table>
+        <div style="height:11px"></div>
+        <div class="dim" style="font-size:12.5px;line-height:1.5">Les jambes sont volontairement au minimum syndical parce que ce n'est pas ton objectif. Sois lucide : à terme, un haut du corps développé sur des jambes de sauterelle se voit. Si un jour tu passes à 4 séances, la quatrième sera une séance de jambes.<br><br>Quatre exercices sont unilatéraux : ils comptent double en temps mais c'est le prix à payer pour ne pas laisser ton côté fort creuser l'écart.</div>
+      </div>
+    </details>
+    <div class="sp24"></div>
+  </div>`;
+}
+
+/* ---------- SÉANCE ---------- */
+function beginSession(k){
+  if(!S.start) S.start=today();
+  S.active={key:k,date:today(),sets:{},t0:Date.now()};
+  PROGRAM[k].ex.forEach(e=>{
+    S.active.sets[e.id]=Array.from({length:e.sets},()=>({w:"",r:"",d:false}));
+  });
+  save(); tab="session"; render(); window.scrollTo(0,0);
+}
+function setVal(exId,i,f,v){ S.active.sets[exId][i][f]=v; save(); }
+function toggleSet(exId,i){
+  const s=S.active.sets[exId][i];
+  s.d=!s.d; save();
+  if(s.d){ const e=exById(exId); if(e.rest) startRest(e.rest); }
+  render();
+}
+function endSession(){
+  const a=S.active;
+  const any=Object.values(a.sets).flat().some(s=>s.w||s.r);
+  if(!any){ if(!confirm("Aucune série enregistrée. Abandonner la séance ?")) return; S.active=null; save(); tab="home"; render(); return; }
+  a.dur=Math.round((Date.now()-a.t0)/60000);
+  Object.keys(a.sets).forEach(k=>{ a.sets[k]=a.sets[k].filter(s=>s.w||s.r); });
+  S.logs.push({date:a.date,key:a.key,sets:a.sets,dur:a.dur});
+  S.active=null; save(); stopRest(); tab="stats"; render(); window.scrollTo(0,0);
+}
+
+function vSession(){
+  const a=S.active, p=PROGRAM[a.key];
+  const doneSets=Object.values(a.sets).flat().filter(s=>s.d).length;
+  const totSets=Object.values(a.sets).flat().length;
+  const pct=Math.round(doneSets/totSets*100);
+  const mins=Math.round((Date.now()-a.t0)/60000);
+
+  return `
+  <div class="topbar">
+    <div><div class="eyebrow">En cours · ${mins} min</div><div class="h1">${p.name}</div></div>
+    <button class="btn ghost sm" onclick="endSession()">Terminer</button>
+  </div>
+  <div class="wrap">
+    <div class="card" style="padding:13px 15px">
+      <div class="between" style="margin-bottom:8px">
+        <span class="dim" style="font-size:12.5px;font-weight:650">${doneSets} / ${totSets} séries</span>
+        <span class="num" style="font-weight:800;font-size:13px">${pct}%</span>
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>
+    ${isDeload()?`<div class="banner">Semaine de décharge : ne fais que la moitié des séries de chaque exercice, avec les mêmes poids.</div>`:""}
+
+    ${p.ex.map((e,i)=>{
+      const sets=a.sets[e.id];
+      const allDone=sets.every(s=>s.d);
+      const v=verdict(e);
+      const lp=lastPerf(e.id);
+      return `
+      <div class="ex ${allDone?'done':''}">
+        <div class="exhead">
+          <div class="exidx">${allDone?'✓':i+1}</div>
+          <div style="flex:1">
+            <div class="exname">${e.n}</div>
+            <div class="exmeta">${e.m} · ${e.sets}×${e.lo}-${e.hi}${e.uni?" par bras":""} · repos ${e.rest?e.rest+" s":"superset"}</div>
+            ${e.uni?`<div style="margin-top:7px"><span class="chip warn">Unilatéral — commence par le côté faible</span></div>`:""}
+          </div>
+        </div>
+        <div class="exbody">
+          <div class="hint">
+            ${lp?`<b>Dernière fois (${fdate(lp.date)}) :</b> ${lp.sets.map(s=>s.w+"×"+s.r).join("  ·  ")}<br>`:""}
+            <span style="color:${v.cls==='acc'?'var(--acc)':v.cls==='warn'?'var(--warn)':'var(--dim)'}">${v.txt}</span>
+          </div>
+          <div class="setrow"><div></div>
+            <div class="lbl">KG</div><div class="lbl">REPS</div><div></div></div>
+          ${sets.map((s,j)=>`
+            <div class="setrow">
+              <div class="lbl">${j+1}</div>
+              <input class="inp" inputmode="decimal" placeholder="—" value="${s.w}" onchange="setVal('${e.id}',${j},'w',this.value)">
+              <input class="inp" inputmode="numeric" placeholder="—" value="${s.r}" onchange="setVal('${e.id}',${j},'r',this.value)">
+              <button class="tick ${s.d?'on':''}" onclick="toggleSet('${e.id}',${j})">
+                <svg viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6.5"/></svg></button>
+            </div>`).join("")}
+          <div style="height:6px"></div>
+          <details style="background:transparent;border:none;margin:0">
+            <summary style="padding:6px 0;font-size:12.5px;color:var(--dim);font-weight:650">Technique</summary>
+            <div class="inner" style="padding:0 0 6px"><div class="cue">${e.cue}</div>
+            <div style="height:7px"></div><div class="dim" style="font-size:12px"><b style="color:var(--txt)">Si occupé :</b> ${e.alt}</div></div>
+          </details>
+        </div>
+      </div>`;
+    }).join("")}
+
+    <div class="sp"></div>
+    <button class="btn" onclick="endSession()">Terminer et enregistrer</button>
+    <div class="sp"></div>
+    <button class="btn ghost" onclick="if(confirm('Abandonner sans enregistrer ?')){S.active=null;save();stopRest();go('home')}">Abandonner</button>
+    <div class="sp24"></div><div class="sp24"></div>
+  </div>`;
+}
+
+/* ---------- PROGRÈS ---------- */
+function sparkline(pts,w,h){
+  if(pts.length<2) return `<div class="dim" style="font-size:13px;padding:22px 0;text-align:center">Ajoute au moins 2 pesées pour voir la courbe.</div>`;
+  const xs=pts.map(p=>new Date(p.d).getTime());
+  const ys=pts.map(p=>p.kg);
+  const x0=Math.min(...xs),x1=Math.max(...xs);
+  const y0=Math.min(...ys)-.6,y1=Math.max(...ys)+.6;
+  const px=i=>((xs[i]-x0)/(x1-x0||1))*(w-8)+4;
+  const py=i=>h-8-((ys[i]-y0)/(y1-y0||1))*(h-20);
+  const d=pts.map((p,i)=>(i?"L":"M")+px(i).toFixed(1)+" "+py(i).toFixed(1)).join(" ");
+  const area=d+` L ${px(pts.length-1).toFixed(1)} ${h} L ${px(0).toFixed(1)} ${h} Z`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#D8FF3E" stop-opacity=".22"/><stop offset="100%" stop-color="#D8FF3E" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#g)"/>
+    <path d="${d}" fill="none" stroke="#D8FF3E" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(i).toFixed(1)}" r="${i===pts.length-1?4:2.4}" fill="#D8FF3E"/>`).join("")}
+  </svg>`;
+}
+
+function addBW(){
+  const v=parseFloat(($("bwin")||{}).value);
+  if(!v||v<35||v>200) return;
+  S.bw=S.bw.filter(x=>x.d!==today());
+  S.bw.push({d:today(),kg:+v.toFixed(1)});
+  S.bw.sort((a,b)=>a.d<b.d?-1:1);
+  save(); render();
+}
+
+function vStats(){
+  const t=bwTrend();
+  const pts=[...S.bw].sort((a,b)=>a.d<b.d?-1:1);
+  const start=pts.length?pts[0].kg:null;
+  const gain=(t&&start!==null)?+(t.cur-start).toFixed(1):null;
+  const recs=allEx().map(e=>({e,b:bestOf(e.id)})).filter(x=>x.b);
+  const last8=[...S.logs].slice(-8).reverse();
+
+  return `
+  <div class="topbar"><div><div class="eyebrow">Semaine ${weekNo()}</div><div class="h1">Progrès</div></div></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="between" style="margin-bottom:12px">
+        <div class="h2">Poids corporel</div>
+        ${gain!==null?`<span class="chip ${gain>0?'ok':''}">${gain>0?"+":""}${gain} kg depuis le début</span>`:""}
+      </div>
+      ${sparkline(pts,320,110)}
+      <div style="height:12px"></div>
+      <div class="row">
+        <input class="inp" id="bwin" inputmode="decimal" placeholder="${t?t.cur:"66"} kg" style="flex:1;text-align:left;padding-left:14px">
+        <button class="btn sm" onclick="addBW()">Enregistrer</button>
+      </div>
+      <div style="height:10px"></div>
+      <div class="dim" style="font-size:12.5px;line-height:1.5">
+        ${t&&t.delta!==null
+          ? `Tendance : <b style="color:${t.perWk>=.15&&t.perWk<=.6?'var(--ok)':'var(--warn)'}">${t.perWk>0?"+":""}${t.perWk} kg/semaine</b>. La cible est entre +0,25 et +0,4. En dessous, tu ne construis pas ; au-dessus, tu prends du gras.`
+          : `Pèse-toi le matin à jeun, 3 fois par semaine. C'est l'indicateur le plus important de tout ce programme — plus que n'importe quel chiffre à la salle.`}
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="stat"><div class="v num">${S.logs.length}</div><div class="k">Séances totales</div></div>
+      <div class="stat"><div class="v num">${S.logs.filter(l=>daysAgo(l.date)<28).length}</div><div class="k">Sur 4 semaines</div></div>
+    </div>
+
+    <div class="sp"></div>
+    <div class="card">
+      <div class="h2" style="margin-bottom:11px">Records</div>
+      ${recs.length?`<table>
+        <tr><th>Exercice</th><th style="text-align:right">Meilleure série</th></tr>
+        ${recs.map(r=>`<tr><td>${r.e.n}</td><td class="n">${r.b.w} kg × ${r.b.r}</td></tr>`).join("")}
+      </table>`:`<div class="dim" style="font-size:13px">Rien encore. Fais ta première séance.</div>`}
+    </div>
+
+    <div class="card">
+      <div class="h2" style="margin-bottom:11px">Historique</div>
+      ${last8.length?last8.map(l=>{
+        const vol=Object.values(l.sets).flat().reduce((a,s)=>a+((parseFloat(s.w)||0)*(parseInt(s.r)||0)),0);
+        const ns=Object.values(l.sets).flat().length;
+        return `<div class="between" style="padding:11px 0;border-bottom:1px solid var(--line)">
+          <div><div style="font-weight:700;font-size:14px">${PROGRAM[l.key].name}</div>
+          <div class="dim" style="font-size:12px">${fdate(l.date)} · ${ns} séries${l.dur?" · "+l.dur+" min":""}</div></div>
+          <div class="num" style="font-weight:800;font-size:14px">${Math.round(vol).toLocaleString("fr-FR")} kg</div>
+        </div>`}).join(""):`<div class="dim" style="font-size:13px">Aucune séance enregistrée.</div>`}
+    </div>
+
+    <div class="sp"></div>
+    <div class="row" style="gap:8px">
+      <button class="btn ghost sm" style="flex:1" onclick="exportData()">Exporter mes données</button>
+      <button class="btn danger sm" style="flex:1" onclick="if(confirm('Tout effacer définitivement ?')){S=blank();save();render()}">Réinitialiser</button>
+    </div>
+    <div class="sp24"></div>
+  </div>`;
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="forge-"+today()+".json";
+  a.click();
+}
+
+/* ---------- NUTRITION ---------- */
+function vFood(){
+  return `
+  <div class="topbar"><div><div class="eyebrow">Prise de masse propre</div><div class="h1">Nutrition</div></div></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="h2" style="margin-bottom:4px">Tes cibles quotidiennes</div>
+      <div class="dim" style="font-size:12.5px;margin-bottom:14px">Estimation pour 1m76 / 66 kg avec 3 séances par semaine, surplus d'environ +350 kcal. À réajuster selon la balance, pas selon la théorie.</div>
+      <div class="grid2" style="gap:14px">
+        <div><div class="macro"><span class="b">${NUTRI.kcal}</span><span class="u">kcal</span></div><div class="k dim" style="font-size:11px">Énergie</div></div>
+        <div><div class="macro"><span class="b" style="color:var(--acc)">${NUTRI.prot}</span><span class="u">g</span></div><div class="k dim" style="font-size:11px">Protéines</div></div>
+        <div><div class="macro"><span class="b">${NUTRI.gluc}</span><span class="u">g</span></div><div class="k dim" style="font-size:11px">Glucides</div></div>
+        <div><div class="macro"><span class="b">${NUTRI.lip}</span><span class="u">g</span></div><div class="k dim" style="font-size:11px">Lipides</div></div>
+      </div>
+    </div>
+
+    <div class="eyebrow" style="padding:6px 2px 10px">La journée type</div>
+    ${NUTRI.day.map(d=>`
+      <div class="card">
+        <div class="between" style="margin-bottom:7px">
+          <div style="font-weight:750;font-size:15px">${d.t}</div>
+          <span class="chip">${d.k}</span>
+        </div>
+        <div class="dim" style="font-size:13.5px;line-height:1.5">${d.d}</div>
+      </div>`).join("")}
+
+    <div class="sp"></div>
+    <div class="eyebrow" style="padding:6px 2px 10px">8 dîners · 30 min max</div>
+    ${NUTRI.meals.map(m=>`
+      <details>
+        <summary><span style="flex:1">${m.n}</span><span class="chip acc" style="flex:0 0 auto">${m.p} g P</span></summary>
+        <div class="inner">
+          <div class="row" style="gap:6px;margin-bottom:12px"><span class="chip">${m.k} kcal</span><span class="chip">${m.t}</span></div>
+          <div class="eyebrow" style="margin-bottom:8px">Ingrédients</div>
+          <ul class="li" style="margin-bottom:14px">${m.ing.map(i=>`<li><span class="dot"></span><span>${i}</span></li>`).join("")}</ul>
+          <div class="eyebrow" style="margin-bottom:8px">Préparation</div>
+          <ol class="ol">${m.st.map(s=>`<li>${s}</li>`).join("")}</ol>
+        </div>
+      </details>`).join("")}
+
+    <div class="card" style="border-color:rgba(255,122,69,.28);background:rgba(255,122,69,.06)">
+      <div class="h2" style="margin-bottom:7px;color:#FFC5AC">Jour de flemme</div>
+      <div style="font-size:13.5px;line-height:1.5;color:#FFD9C8">${NUTRI.lazy}</div>
+    </div>
+
+    <div class="sp"></div>
+    <div class="eyebrow" style="padding:6px 2px 10px">Les règles qui comptent</div>
+    <div class="card">
+      <ul class="li">${NUTRI.rules.map(r=>`<li><span class="dot"></span><span>${r}</span></li>`).join("")}</ul>
+    </div>
+
+    <details>
+      <summary>Compléments : ce qui sert vraiment</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span><b>Créatine monohydrate, 5 g/jour.</b> Le seul complément avec un effet clairement démontré sur la prise de muscle. N'importe quelle marque, à n'importe quel moment de la journée, tous les jours y compris sans entraînement. Environ 20 € pour six mois.</span></li>
+          <li><span class="dot"></span><span><b>Whey :</b> utile uniquement si tu n'atteins pas 140 g de protéines avec la nourriture. Ce n'est pas magique, c'est juste de la protéine pratique.</span></li>
+          <li><span class="dot"></span><span><b>Vitamine D</b> l'hiver si tu ne vois pas beaucoup le soleil.</span></li>
+          <li><span class="dot"></span><span><b>Tout le reste — BCAA, pre-workout, brûleurs, testo boosters :</b> inutile. Garde ton argent pour la nourriture.</span></li>
+        </ul>
+      </div>
+    </details>
+    <div class="sp24"></div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   8. RENDER
+   ══════════════════════════════════════════ */
+function render(){
+  if(tab==="session" && !S.active) tab="home";
+  const v = tab==="session" ? vSession()
+          : tab==="prog" ? vProg()
+          : tab==="stats" ? vStats()
+          : tab==="food" ? vFood()
+          : vHome();
+  $("app").innerHTML=v;
+  navBar();
+}
+if(S.active) tab="session";
+render();
+</script>
+</body>
+</html>
