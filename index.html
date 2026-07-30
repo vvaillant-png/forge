@@ -212,10 +212,10 @@ const PROGRAM = {
     focus:"La séance qui construit le volume frontal : haut de pecs et deltoïdes.",
     ex:[
       {id:"a1",n:"Développé incliné haltères",m:"Haut de pecs",sets:4,lo:6,hi:10,rest:120,
-       cue:"Banc à 30° max. <b>Spécifique à toi :</b> arrête de chercher à plaquer les deux omoplates à plat sur le banc — avec ta gibbosité c'est mécaniquement impossible et forcer ne fera que crisper le côté droit. Cale-toi confortablement, garde la poitrine sortie, et laisse chaque bras suivre sa trajectoire naturelle. Les haltères permettent exactement ça, c'est pour cette raison qu'ils remplacent la barre ici. Descente contrôlée en 2 secondes, remontée explosive.",
+       cue:"Banc à 30° max. Ne cherche pas à plaquer les deux omoplates parfaitement à plat sur le banc : forcer cette position ne fait que te crisper. Cale-toi confortablement, garde la poitrine sortie, et laisse chaque bras suivre sa trajectoire naturelle. Les haltères permettent exactement ça, c'est pour cette raison qu'ils remplacent la barre ici. Descente contrôlée en 2 secondes, remontée explosive.",
        alt:"Machine à convergence inclinée (encore mieux si elle est à bras indépendants)."},
       {id:"a2",n:"Landmine press unilatéral",m:"Épaules avant / haut de pecs",sets:3,lo:8,hi:12,rest:90,uni:true,
-       cue:"Une extrémité de barre dans le coin ou dans le sabot, tu pousses en diagonale vers le haut, un bras à la fois. <b>C'est le remplaçant du développé militaire :</b> l'omoplate reste libre de tourner naturellement, il n'y a aucune compression verticale sur la colonne, et chaque côté travaille indépendamment. Avec une scoliose rotative c'est nettement supérieur à une poussée au-dessus de la tête. Commence toujours par le côté faible.",
+       cue:"Une extrémité de barre dans le coin ou dans le sabot, tu pousses en diagonale vers le haut, un bras à la fois. <b>C'est le remplaçant du développé militaire :</b> l'omoplate reste libre de tourner naturellement, il n'y a aucune compression verticale sur la colonne, et chaque côté travaille indépendamment. Commence toujours par le côté faible.",
        alt:"Machine développé épaules à bras indépendants, ou développé haltère un bras assis avec dossier."},
       {id:"a3",n:"Écarté poulie vis-à-vis (haut vers bas)",m:"Pecs",sets:3,lo:12,hi:15,rest:60,
        cue:"Poulies réglées haut, tu ramènes vers le bas du sternum. Coudes légèrement fléchis et FIXES. Une seconde de contraction au centre. C'est l'étirement en position ouverte qui fait le boulot, ne raccourcis pas l'amplitude.",
@@ -236,13 +236,13 @@ const PROGRAM = {
        cue:"Prise un peu plus large que les épaules. Tire avec les COUDES vers les hanches, pas avec les mains. Léger recul du buste (~15°), poitrine sortie. Tu ramènes la barre à la clavicule, pas derrière la nuque.",
        alt:"Tractions assistées à la machine."},
       {id:"b2",n:"Rowing unilatéral (machine buste appuyé, un bras)",m:"Milieu du dos",sets:3,lo:8,hi:12,rest:90,uni:true,
-       cue:"<b>L'exercice le plus important de ton programme.</b> Buste calé sur le support, une main à la fois. Chaque omoplate suit sa propre trajectoire au lieu d'être forcée dans un schéma symétrique que ta cage thoracique ne peut pas produire. Laisse l'omoplate s'étirer complètement en avant, puis tire jusqu'au bas des côtes. Commence toujours par le côté faible et n'accorde pas au côté fort une seule rep de plus.",
+       cue:"<b>L'exercice le plus important de ton programme.</b> Buste calé sur le support, une main à la fois. Chaque omoplate suit sa propre trajectoire au lieu d'être forcée dans un schéma symétrique imposé par la machine. Laisse l'omoplate s'étirer complètement en avant, puis tire jusqu'au bas des côtes. Commence toujours par le côté faible et n'accorde pas au côté fort une seule rep de plus.",
        alt:"Rowing haltère un bras, main et genou opposés sur le banc."},
       {id:"b3",n:"Pull-over poulie haute à genoux (bras tendus)",m:"Grand dorsal",sets:2,lo:12,hi:15,rest:45,
        cue:"À genoux face à la poulie plutôt que debout penché : le bassin est stable et le bas du dos ne travaille pas en flexion. Bras quasi tendus, tu abaisses la corde vers les cuisses. Isole le dorsal sans les biceps.",
        alt:"Straight-arm pulldown assis."},
       {id:"b4",n:"Face pull poulie haute",m:"Arrière d'épaules / trapèzes inférieurs",sets:4,lo:15,hi:20,rest:45,
-       cue:"<b>Passé de 3 à 4 séries à cause de ton omoplate.</b> Corde à hauteur du visage, tu tires vers le front en écartant, coudes HAUTS, et tu termines en abaissant activement les omoplates vers les poches arrière. C'est le meilleur travail de trapèze inférieur disponible, et le trapèze inférieur est le muscle qui plaque l'omoplate contre les côtes. Toujours léger, toujours propre.",
+       cue:"<b>Quatre séries, et c'est volontaire.</b> Corde à hauteur du visage, tu tires vers le front en écartant, coudes HAUTS, et tu termines en abaissant activement les omoplates vers les poches arrière. C'est le meilleur travail de trapèze inférieur disponible, et le trapèze inférieur est le muscle qui plaque l'omoplate contre les côtes. Toujours léger, toujours propre.",
        alt:"Oiseau à la poulie ou reverse pec-deck."},
       {id:"b5",n:"SUPERSET — Curl incliné haltères",m:"Biceps (long chef)",sets:3,lo:10,hi:12,rest:0,
        cue:"Banc à 45-60°, bras qui pendent DERRIÈRE le corps : c'est cette position étirée qui fait grossir le biceps en volume. Enchaîne directement sur le curl marteau, sans repos.",
@@ -257,13 +257,13 @@ const PROGRAM = {
     focus:"Le strict minimum pour les jambes (sinon tu auras l'air déséquilibré), puis on repasse une couche sur ce qui compte pour toi.",
     ex:[
       {id:"c1",n:"Presse à cuisses",m:"Quadriceps / fessiers",sets:3,lo:10,hi:15,rest:120,
-       cue:"Pieds à mi-plateau, largeur d'épaules. Ta radio ne montre ni bascule de bassin ni inégalité de jambes : cet exercice ne pose aucun problème chez toi, tu peux charger normalement. Seule règle, valable pour tout le monde : tu t'arrêtes dès que le bassin s'enroule et que le bas du dos décolle du dossier. Zéro squat barre sur le dos et zéro soulevé de terre dans ce programme, c'est délibéré.",
+       cue:"Pieds à mi-plateau, largeur d'épaules. Tu peux charger normalement. Seule règle : tu t'arrêtes dès que le bassin s'enroule et que le bas du dos décolle du dossier. Zéro squat barre sur le dos et zéro soulevé de terre dans ce programme, c'est délibéré.",
        alt:"Presse unilatérale une jambe à la fois si tu sens une nette différence gauche/droite."},
       {id:"c2",n:"Leg curl allongé ou assis",m:"Ischio-jambiers",sets:2,lo:12,hi:15,rest:45,
        cue:"Deux séries, non négociables : c'est l'assurance genou/dos la moins chère du monde.",
        alt:"Soulevé de terre roumain haltères."},
       {id:"c3",n:"Développé machine convergente, un bras à la fois",m:"Pecs",sets:3,lo:8,hi:12,rest:90,uni:true,
-       cue:"<b>Remplace le développé couché à plat, qui est le pire cas de figure pour toi :</b> le banc impose une position symétrique que ta cage thoracique ne peut pas prendre, d'où tes sensations différentes à gauche et à droite. Assis avec le dos calé, un bras à la fois, chaque côté charge indépendamment et tu peux enfin comparer honnêtement. Commence par le côté faible.",
+       cue:"<b>Remplace le développé couché à plat :</b> le banc impose une position symétrique et fige les appuis, ce qui explique des sensations différentes à gauche et à droite. Assis avec le dos calé, un bras à la fois, chaque côté charge indépendamment et tu peux enfin comparer honnêtement. Commence par le côté faible.",
        alt:"Développé haltère un bras allongé, ou pec-deck unilatéral."},
       {id:"c4",n:"Élévations latérales à la poulie (unilatéral)",m:"Deltoïde latéral",sets:4,lo:12,hi:15,rest:45,uni:true,
        cue:"Poulie basse, câble qui passe devant le corps, tu montes de côté. Tension constante du début à la fin, bien supérieure à l'haltère. C'est le rappel qui construit ta largeur.",
@@ -283,8 +283,7 @@ const ORDER = ["A","B","C"];
 const WARMUP = [
   "3 min de rameur ou vélo, rythme facile — juste pour monter la température.",
   "<b>Glissements au mur × 10.</b> Dos au mur, avant-bras contre le mur, tu montes et descends les bras en gardant le contact. Réveille les trapèzes inférieurs et le dentelé antérieur, les deux muscles qui plaquent l'omoplate contre les côtes.",
-  "<b>Dentelé antérieur × 10 par bras.</b> À la poulie basse ou en pompe contre un mur : bras tendu devant, tu pousses l'épaule le plus loin possible vers l'avant, tu tiens 1 seconde. Insiste à droite, du côté de la gibbosité.",
-  "<b>Respiration dérotatrice × 8.</b> Assis bien droit, une main sur les côtes gauches. Tu inspires lentement par le nez en cherchant à gonfler <i>uniquement</i> le côté gauche du thorax, celui qui est concave et qui s'ouvre mal, puis tu expires en grandissant la colonne vers le plafond. C'est un emprunt à la méthode Schroth : ça ne redresse rien, mais ça entretient la mobilité de la cage du côté fermé.",
+  "<b>Dentelé antérieur × 10 par bras.</b> À la poulie basse ou en pompe contre un mur : bras tendu devant, tu pousses l'épaule le plus loin possible vers l'avant, tu tiens 1 seconde. Insiste du côté le plus faible.",
   "10 rotations d'épaules en arrière + 10 dislocations avec un élastique ou un bâton.",
   "Premier exercice : 1 série à vide × 10, puis 1 série à ~60 % du poids de travail × 5. Ce sont des séries d'échauffement, tu ne les notes PAS.",
   "Pour les exercices suivants : 1 série légère suffit, ou zéro si le muscle est déjà chaud."
@@ -581,7 +580,7 @@ function vHome(){
           <li><span class="dot"></span><span><b>Contrôle la descente.</b> 2 secondes en excentrique, explosif en concentrique. C'est gratuit et ça double la qualité de chaque série.</span></li>
           <li><span class="dot"></span><span><b>Mange plus que ce que tu crois.</b> À 66 kg pour 1m76, l'entraînement n'est pas ton facteur limitant. La fourchette l'est.</span></li>
           <li><span class="dot"></span><span><b>7 à 8 h de sommeil.</b> C'est là que le muscle se construit, pas à la salle. Une nuit de 5 h annule une bonne partie de la séance de la veille.</span></li>
-          <li><span class="dot"></span><span><b>Sur les exercices unilatéraux : commence par le côté faible, et le côté fort ne fait pas une rep de plus.</b> C'est ta règle personnelle, celle qui empêche ton asymétrie de s'aggraver. Détails dans l'onglet Programme.</span></li>
+          <li><span class="dot"></span><span><b>Sur les exercices unilatéraux : commence par le côté faible, et le côté fort ne fait pas une rep de plus.</b> Le côté dominant prend naturellement plus de charge et l'écart se creuse mois après mois. C'est la seule façon de l'empêcher.</span></li>
         </ul>
       </div>
     </details>
@@ -631,25 +630,6 @@ function vProg(){
       </details>`).join("")}
 
     <div class="sp"></div>
-    <details>
-      <summary>Ta scoliose : 36° dorsale, convexité droite</summary>
-      <div class="inner">
-        <div class="hint" style="margin-bottom:13px">
-          <b>Téléradiographie du 06/06/2019 (Pr Boyer, CIMI Paris 13) :</b> scoliose dorsale à concavité gauche avec rotation des corps vertébraux, <b>36° selon Lippmann-Cobb</b>. Pas d'anomalie morphologique vertébrale. Pas de trouble statique sagittal. Pas de bascule du bassin. Pas d'inégalité de longueur des membres inférieurs.
-        </div>
-        <ul class="li">
-          <li><span class="dot"></span><span><b>36°, ce n'est pas une petite scoliose.</b> On parle de scoliose au-delà de 10°, de courbure modérée à partir de 25°, et la discussion chirurgicale commence vers 45-50°. Tu es dans le haut de la zone modérée. Ça ne t'interdit rien de ce qui est dans ce programme, mais ça justifie chacune des adaptations qui y ont été faites.</span></li>
-          <li><span class="dot"></span><span><b>Concavité gauche = convexité droite = gibbosité à droite.</b> Le compte-rendu explique exactement ce que tu décris : la rotation vertébrale entraîne les côtes droites vers l'arrière, ce qui fait ressortir ton omoplate droite. Devant, c'est l'inverse — le thorax droit s'aplatit légèrement, d'où ton impression d'asymétrie sur les pectoraux. Tu n'imagines rien.</span></li>
-          <li><span class="dot"></span><span><b>La radio date de 2019, tu avais 19 ans. Refais-en une.</b> Les courbures dorsales dépassant 30° à maturité osseuse progressent en moyenne de 0,5 à 1° par an à l'âge adulte. Sur sept ans, ça peut représenter quelques degrés — ou rien du tout. Une nouvelle téléradiographie te donne la seule information qui compte vraiment : est-ce que ça bouge ou pas. Ça se demande à un médecin généraliste en cinq minutes.</span></li>
-          <li><span class="dot"></span><span><b>Bonne nouvelle sur le bas du corps :</b> pas de bascule de bassin, pas d'inégalité de longueur de jambes, pas de trouble sagittal. Le problème est confiné à l'étage dorsal. La presse à cuisses ne pose donc aucun souci, et tu n'as pas besoin de talonnette ni de correction quelconque.</span></li>
-          <li><span class="dot"></span><span><b>À 36° avec rotation, un kiné formé à la méthode Schroth vaut le détour</b>, même sans douleur. C'est la seule approche rééducative qui a des données correctes sur les courbures modérées de l'adulte : travail respiratoire de dérotation et autograndissement. Quelques séances pour apprendre, puis 10 min par jour chez toi. Ça ne remplace pas la musculation, ça se cumule.</span></li>
-          <li><span class="dot"></span><span><b>La musculation n'aggrave pas une scoliose idiopathique.</b> Aucune donnée sérieuse ne le montre, y compris à ce niveau de courbure. Ce qui pose problème, c'est la compression axiale lourde et la flexion lombaire sous charge : squat barre sur le dos, soulevé de terre, rowing barre penché, développé militaire debout. Aucun n'est dans ce programme, et ce n'est pas un hasard.</span></li>
-          <li><span class="dot"></span><span><b>Ta gibbosité ne partira pas avec l'entraînement.</b> C'est de l'os en rotation, pas du muscle. Aucun exercice ne dérotate une vertèbre. Ce que le muscle peut faire, c'est combler autour et rendre l'asymétrie nettement moins lisible — à 66 kg tu n'as presque rien pour la masquer, à 73 kg ce sera très différent. C'est réel, mais ce n'est pas une correction.</span></li>
-          <li><span class="dot"></span><span><b>Le vrai risque à l'entraînement, c'est que ton côté fort creuse l'écart.</b> Sur un exercice à deux bras, le côté dominant prend automatiquement plus de charge, mois après mois. D'où les quatre exercices unilatéraux, et d'où la règle qui suit.</span></li>
-          <li><span class="dot"></span><span><b>La règle du côté faible, sans exception :</b> tu commences la série par le côté faible, tu vas jusqu'à 1-2 reps de l'échec, et tu fais <b>exactement le même nombre de reps</b> de l'autre côté, même s'il pourrait en faire quatre de plus. C'est frustrant. C'est aussi la seule chose qui empêche l'écart de grandir.</span></li>
-        </ul>
-      </div>
-    </details>
     <details><summary>Échauffement (6 min, non négociable)</summary>
       <div class="inner"><ol class="ol">${WARMUP.map(w=>`<li>${w}</li>`).join("")}</ol></div>
     </details>
