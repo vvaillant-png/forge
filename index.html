@@ -105,6 +105,13 @@ nav span{font-size:10px;font-weight:700;letter-spacing:.2px}
   padding:4px 9px;border-radius:6px;background:var(--acc);color:#0A0A0C
 }
 
+/* ---------- paires ---------- */
+.pairhead{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--acc);margin:20px 2px 9px}
+.pairhead:first-child{margin-top:4px}
+.pairhead::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(216,255,62,.35),transparent)}
+.pairwrap{border-left:2px solid rgba(216,255,62,.22);padding-left:10px;margin-bottom:4px}
+
 /* ---------- exercise ---------- */
 .ex{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .ex.done{border-color:rgba(216,255,62,.3)}
@@ -191,7 +198,7 @@ ul.li li b{color:var(--txt);font-weight:650}
 <div id="app"></div>
 
 <div id="timer">
-  <div><div class="lab">Repos</div><div class="t" id="tval">1:30</div></div>
+  <div><div class="lab" id="tlab">Repos</div><div class="t" id="tval">1:30</div></div>
   <div class="row" style="gap:7px">
     <button onclick="addRest(-15)">−15</button>
     <button onclick="addRest(15)">+15</button>
@@ -210,76 +217,106 @@ ul.li li b{color:var(--txt);font-weight:650}
 
 const PROGRAM = {
   A:{
-    key:"A", name:"POUSSÉE", sub:"Pecs · Épaules · Triceps",
-    focus:"La séance qui construit le volume frontal : haut de pecs et deltoïdes.",
+    key:"A", name:"HAUT A", sub:"Pecs · Dos · Épaules · Bras",
+    focus:"Poussée inclinée et tirage vertical appariés. Les deux exercices les plus lourds de ta semaine, faits en moitié moins de temps.",
     ex:[
-      {id:"a1",n:"Développé incliné haltères",m:"Haut de pecs",sets:4,lo:6,hi:10,rest:120,
-       cue:"Banc à 30° max. Ne cherche pas à plaquer les deux omoplates parfaitement à plat sur le banc : forcer cette position ne fait que te crisper. Cale-toi confortablement, garde la poitrine sortie, et laisse chaque bras suivre sa trajectoire naturelle. Les haltères permettent exactement ça, c'est pour cette raison qu'ils remplacent la barre ici. Descente contrôlée en 2 secondes, remontée explosive.",
-       alt:"Machine à convergence inclinée (encore mieux si elle est à bras indépendants)."},
-      {id:"a2",n:"Landmine press unilatéral",m:"Épaules avant / haut de pecs",sets:3,lo:8,hi:12,rest:90,uni:true,
-       cue:"Une extrémité de barre dans le coin ou dans le sabot, tu pousses en diagonale vers le haut, un bras à la fois. <b>C'est le remplaçant du développé militaire :</b> l'omoplate reste libre de tourner naturellement, il n'y a aucune compression verticale sur la colonne, et chaque côté travaille indépendamment. Commence toujours par le côté faible.",
-       alt:"Machine développé épaules à bras indépendants, ou développé haltère un bras assis avec dossier."},
-      {id:"a3",n:"Écarté poulie vis-à-vis (haut vers bas)",m:"Pecs",sets:3,lo:12,hi:15,rest:60,
-       cue:"Poulies réglées haut, tu ramènes vers le bas du sternum. Coudes légèrement fléchis et FIXES. Une seconde de contraction au centre. C'est l'étirement en position ouverte qui fait le boulot, ne raccourcis pas l'amplitude.",
-       alt:"Pec-deck."},
-      {id:"a4",n:"Élévations latérales haltères",m:"Deltoïde latéral",sets:4,lo:12,hi:20,rest:45,
-       cue:"L'exercice n°1 de ton objectif : c'est lui qui donne la largeur d'épaules. Léger, propre, buste très légèrement penché en avant. Monte jusqu'à l'horizontale, descends en 2 secondes. Si tu balances le corps, le poids est trop lourd. Regarde-toi de face dans le miroir : si un bras monte plus haut que l'autre, baisse la charge jusqu'à ce que les deux soient identiques.",
-       alt:"Élévations à la poulie basse (encore mieux, tension constante)."},
-      {id:"a5",n:"Extension triceps poulie haute (corde)",m:"Triceps",sets:3,lo:10,hi:15,rest:45,
-       cue:"Coudes collés au corps et immobiles. Écarte la corde en fin de mouvement. Contrôle la remontée.",
-       alt:"Barre droite si la corde est prise."}
+      {id:"a1",n:"Développé incliné haltères",m:"Haut de pecs",sets:4,lo:6,hi:10,rest:20,blk:"A",pos:1,
+       cue:"Banc à 30° max. Ne cherche pas à plaquer les deux omoplates parfaitement à plat : forcer cette position ne fait que te crisper. Descente contrôlée en 2 secondes, remontée explosive. <b>Dès la série finie, tu enchaînes sur le tirage vertical</b> — 20 secondes pour changer de poste, pas plus.",
+       alt:"Machine à convergence inclinée."},
+      {id:"a2",n:"Tirage vertical prise large",m:"Grand dorsal",sets:4,lo:8,hi:12,rest:65,blk:"A",pos:2,
+       cue:"Prise un peu plus large que les épaules, tu tires avec les COUDES vers les hanches. Léger recul du buste, poitrine sortie, barre à la clavicule. <b>Puis 65 s de pause avant de repartir sur le développé.</b> Chaque muscle récupère ainsi 2 minutes pleines entre ses propres séries.",
+       alt:"Tractions assistées à la machine."},
+
+      {id:"a3",n:"Landmine press unilatéral",m:"Épaules avant",sets:3,lo:8,hi:12,rest:20,blk:"B",pos:1,uni:true,
+       cue:"Une extrémité de barre dans le coin, tu pousses en diagonale vers le haut, un bras à la fois. L'omoplate reste libre de tourner, aucune compression verticale sur la colonne. Les deux bras, puis tu passes au rowing. Commence toujours par le côté faible.",
+       alt:"Machine développé épaules à bras indépendants."},
+      {id:"a4",n:"Rowing unilatéral, buste appuyé",m:"Milieu du dos",sets:3,lo:8,hi:12,rest:20,blk:"B",pos:2,uni:true,
+       cue:"Buste calé sur le support, une main à la fois. Laisse l'omoplate s'étirer complètement vers l'avant, puis tire jusqu'au bas des côtes. Côté faible en premier, et le côté fort ne fait pas une rep de plus. Cette paire ne demande aucune pause supplémentaire : le temps de faire les deux bras suffit à récupérer.",
+       alt:"Rowing haltère un bras, main et genou sur le banc."},
+
+      {id:"a5",n:"Élévations latérales haltères",m:"Deltoïde latéral",sets:4,lo:12,hi:20,rest:15,blk:"C",pos:1,
+       cue:"L'exercice n°1 de ton objectif : c'est lui qui donne la largeur. Léger, propre, buste très légèrement penché. Monte à l'horizontale, descends en 2 secondes. Si tu balances le corps, c'est trop lourd. Regarde-toi de face : si un bras monte plus haut, baisse la charge.",
+       alt:"Élévations à la poulie basse."},
+      {id:"a6",n:"Extension triceps poulie haute (corde)",m:"Triceps",sets:3,lo:10,hi:15,rest:30,blk:"C",pos:2,
+       cue:"Coudes collés au corps et immobiles, tu écartes la corde en fin de mouvement. Les élévations et les triceps ne se gênent pas : tu peux les alterner sans perdre une seule rep.",
+       alt:"Barre droite à la poulie."},
+
+      {id:"a7",n:"Face pull poulie haute",m:"Arrière d'épaules",sets:3,lo:15,hi:20,rest:15,blk:"D",pos:1,
+       cue:"Corde à hauteur du visage, tu tires vers le front en écartant, coudes HAUTS, puis tu abaisses activement les omoplates. Meilleur travail de trapèze inférieur disponible. Toujours léger.",
+       alt:"Reverse pec-deck."},
+      {id:"a8",n:"Curl incliné haltères",m:"Biceps (long chef)",sets:3,lo:10,hi:12,rest:30,blk:"D",pos:2,
+       cue:"Banc à 45-60°, bras qui pendent DERRIÈRE le corps : c'est cette position étirée qui fait grossir le biceps en volume. Dernière paire de la séance, tu peux vider le réservoir.",
+       alt:"Curl barre EZ."}
     ]
   },
   B:{
-    key:"B", name:"TIRAGE", sub:"Dos · Biceps · Arrière d'épaules",
-    focus:"Le dos, c'est ce qui te fait paraître large de face ET de dos. Ne le néglige pas.",
+    key:"B", name:"HAUT B", sub:"Pecs · Dos · Épaules · Bras",
+    focus:"Deuxième dose hebdomadaire sur chaque muscle du haut, angles différents. La fréquence 2x/semaine bat largement 1x.",
     ex:[
-      {id:"b1",n:"Tirage vertical prise large",m:"Grand dorsal",sets:4,lo:8,hi:12,rest:120,
-       cue:"Prise un peu plus large que les épaules. Tire avec les COUDES vers les hanches, pas avec les mains. Léger recul du buste (~15°), poitrine sortie. Tu ramènes la barre à la clavicule, pas derrière la nuque.",
-       alt:"Tractions assistées à la machine."},
-      {id:"b2",n:"Rowing unilatéral (machine buste appuyé, un bras)",m:"Milieu du dos",sets:3,lo:8,hi:12,rest:90,uni:true,
-       cue:"<b>L'exercice le plus important de ton programme.</b> Buste calé sur le support, une main à la fois. Chaque omoplate suit sa propre trajectoire au lieu d'être forcée dans un schéma symétrique imposé par la machine. Laisse l'omoplate s'étirer complètement en avant, puis tire jusqu'au bas des côtes. Commence toujours par le côté faible et n'accorde pas au côté fort une seule rep de plus.",
-       alt:"Rowing haltère un bras, main et genou opposés sur le banc."},
-      {id:"b3",n:"Pull-over poulie haute à genoux (bras tendus)",m:"Grand dorsal",sets:2,lo:12,hi:15,rest:45,
-       cue:"À genoux face à la poulie plutôt que debout penché : le bassin est stable et le bas du dos ne travaille pas en flexion. Bras quasi tendus, tu abaisses la corde vers les cuisses. Isole le dorsal sans les biceps.",
+      {id:"b1",n:"Développé machine convergente, un bras",m:"Pecs",sets:3,lo:8,hi:12,rest:20,blk:"A",pos:1,uni:true,
+       cue:"Assis, dos calé, un bras à la fois : chaque côté charge indépendamment et tu peux enfin comparer honnêtement gauche et droite. Le banc plat est écarté du programme, il fige les appuis et explique tes sensations inégales.",
+       alt:"Développé haltère un bras allongé."},
+      {id:"b2",n:"Rowing poulie basse prise neutre",m:"Milieu du dos",sets:3,lo:8,hi:12,rest:45,blk:"A",pos:2,
+       cue:"Assis, buste quasi vertical, tu tires vers le nombril en gardant le dos droit. Étirement complet en avant sans arrondir le bas du dos. Serre les omoplates 1 seconde.",
+       alt:"Machine rowing buste appuyé."},
+
+      {id:"b3",n:"Écarté poulie vis-à-vis (haut vers bas)",m:"Pecs",sets:3,lo:12,hi:15,rest:15,blk:"B",pos:1,
+       cue:"Poulies réglées haut, tu ramènes vers le bas du sternum. Coudes légèrement fléchis et FIXES. Une seconde de contraction au centre. C'est l'étirement en position ouverte qui fait le travail.",
+       alt:"Pec-deck."},
+      {id:"b4",n:"Pull-over poulie haute à genoux",m:"Grand dorsal",sets:3,lo:12,hi:15,rest:45,blk:"B",pos:2,
+       cue:"À genoux face à la poulie plutôt que debout penché : bassin stable, bas du dos épargné. Bras quasi tendus, tu abaisses la corde vers les cuisses. Isole le dorsal sans les biceps.",
        alt:"Straight-arm pulldown assis."},
-      {id:"b4",n:"Face pull poulie haute",m:"Arrière d'épaules / trapèzes inférieurs",sets:4,lo:15,hi:20,rest:45,
-       cue:"<b>Quatre séries, et c'est volontaire.</b> Corde à hauteur du visage, tu tires vers le front en écartant, coudes HAUTS, et tu termines en abaissant activement les omoplates vers les poches arrière. C'est le meilleur travail de trapèze inférieur disponible, et le trapèze inférieur est le muscle qui plaque l'omoplate contre les côtes. Toujours léger, toujours propre.",
-       alt:"Oiseau à la poulie ou reverse pec-deck."},
-      {id:"b5",n:"SUPERSET — Curl incliné haltères",m:"Biceps (long chef)",sets:3,lo:10,hi:12,rest:0,
-       cue:"Banc à 45-60°, bras qui pendent DERRIÈRE le corps : c'est cette position étirée qui fait grossir le biceps en volume. Enchaîne directement sur le curl marteau, sans repos.",
-       alt:"Curl barre EZ."},
-      {id:"b6",n:"SUPERSET — Curl marteau",m:"Brachial / avant-bras",sets:3,lo:12,hi:15,rest:60,
-       cue:"Directement après le curl incliné, puis 60 s de repos avant de recommencer. Le brachial passe SOUS le biceps : le développer pousse le biceps vers le haut et épaissit le bras vu de profil. Prise neutre stricte.",
-       alt:"Curl à la corde poulie basse."}
+
+      {id:"b5",n:"Élévations latérales poulie, unilatéral",m:"Deltoïde latéral",sets:4,lo:12,hi:15,rest:15,blk:"C",pos:1,uni:true,
+       cue:"Poulie basse, câble devant le corps, tu montes de côté. Tension constante du début à la fin, très supérieure à l'haltère. Côté faible en premier.",
+       alt:"Élévations haltères en drop set."},
+      {id:"b6",n:"Curl marteau",m:"Brachial / avant-bras",sets:3,lo:12,hi:15,rest:30,blk:"C",pos:2,
+       cue:"Le brachial passe SOUS le biceps : le développer pousse le biceps vers le haut et épaissit le bras vu de profil. Prise neutre stricte, pas de rotation, pas de balancier.",
+       alt:"Curl à la corde poulie basse."},
+
+      {id:"b7",n:"Face pull poulie haute",m:"Arrière d'épaules",sets:3,lo:15,hi:20,rest:15,blk:"D",pos:1,
+       cue:"Deuxième dose de la semaine. Coudes hauts, écartement en fin de course, omoplates qui descendent. Léger.",
+       alt:"Oiseau haltères penché."},
+      {id:"b8",n:"Extension triceps au-dessus de la tête",m:"Triceps (long chef)",sets:3,lo:12,hi:15,rest:30,blk:"D",pos:2,
+       cue:"Bras au-dessus de la tête : cette position étire le long chef du triceps, la portion qui donne le volume au bras vu de dos. Coudes serrés, ne les laisse pas s'écarter.",
+       alt:"Extension haltère 2 mains derrière la nuque."}
     ]
   },
   C:{
-    key:"C", name:"LARGEUR", sub:"Jambes (minimum) · Épaules · Bras",
-    focus:"Le strict minimum pour les jambes (sinon tu auras l'air déséquilibré), puis on repasse une couche sur ce qui compte pour toi.",
+    key:"C", name:"JAMBES + LARGEUR",
+    sub:"Jambes (minimum) · Épaules · Bras",
+    focus:"Le strict minimum sur les jambes, apparié à du haut du corps pour ne pas perdre une seconde. Puis on repasse une couche sur la largeur d'épaules.",
     ex:[
-      {id:"c1",n:"Presse à cuisses",m:"Quadriceps / fessiers",sets:3,lo:10,hi:15,rest:120,
-       cue:"Pieds à mi-plateau, largeur d'épaules. Tu peux charger normalement. Seule règle : tu t'arrêtes dès que le bassin s'enroule et que le bas du dos décolle du dossier. Zéro squat barre sur le dos et zéro soulevé de terre dans ce programme, c'est délibéré.",
-       alt:"Presse unilatérale une jambe à la fois si tu sens une nette différence gauche/droite."},
-      {id:"c2",n:"Leg curl allongé ou assis",m:"Ischio-jambiers",sets:2,lo:12,hi:15,rest:45,
-       cue:"Deux séries, non négociables : c'est l'assurance genou/dos la moins chère du monde.",
-       alt:"Soulevé de terre roumain haltères."},
-      {id:"c3",n:"Développé machine convergente, un bras à la fois",m:"Pecs",sets:3,lo:8,hi:12,rest:90,uni:true,
-       cue:"<b>Remplace le développé couché à plat :</b> le banc impose une position symétrique et fige les appuis, ce qui explique des sensations différentes à gauche et à droite. Assis avec le dos calé, un bras à la fois, chaque côté charge indépendamment et tu peux enfin comparer honnêtement. Commence par le côté faible.",
-       alt:"Développé haltère un bras allongé, ou pec-deck unilatéral."},
-      {id:"c4",n:"Élévations latérales à la poulie (unilatéral)",m:"Deltoïde latéral",sets:4,lo:12,hi:15,rest:45,uni:true,
-       cue:"Poulie basse, câble qui passe devant le corps, tu montes de côté. Tension constante du début à la fin, bien supérieure à l'haltère. C'est le rappel qui construit ta largeur.",
-       alt:"Élévations haltères en drop set."},
-      {id:"c5",n:"SUPERSET — Extension triceps au-dessus de la tête",m:"Triceps (long chef)",sets:3,lo:12,hi:15,rest:0,
-       cue:"Enchaîne directement avec le curl poulie sans repos. La position bras au-dessus de la tête étire le long chef du triceps : c'est la portion qui donne le volume au bras vu de dos.",
-       alt:"Extension haltère 2 mains derrière la nuque."},
-      {id:"c6",n:"SUPERSET — Curl poulie basse",m:"Biceps",sets:3,lo:12,hi:15,rest:60,
-       cue:"Directement après le triceps, puis 60 s de repos avant de recommencer le superset. Amplitude complète, pas de balancier.",
-       alt:"Curl haltères debout."}
+      {id:"c1",n:"Presse à cuisses",m:"Quadriceps / fessiers",sets:3,lo:10,hi:15,rest:20,blk:"A",pos:1,
+       cue:"Pieds à mi-plateau, largeur d'épaules. Tu peux charger normalement. Seule règle : tu t'arrêtes dès que le bassin s'enroule et que le bas du dos décolle du dossier. Zéro squat barre et zéro soulevé de terre dans ce programme, c'est délibéré.",
+       alt:"Squat gobelet haltère."},
+      {id:"c2",n:"Tirage vertical prise neutre",m:"Grand dorsal",sets:3,lo:8,hi:12,rest:65,blk:"A",pos:2,
+       cue:"Prise serrée en marteau, poignée en V. Angle différent du tirage prise large de la séance A, ça complète le dos par le bas. Coudes vers les hanches.",
+       alt:"Tirage vertical prise supination."},
+
+      {id:"c3",n:"Leg curl allongé ou assis",m:"Ischio-jambiers",sets:3,lo:12,hi:15,rest:20,blk:"B",pos:1,
+       cue:"Trois séries, non négociables : c'est l'assurance genou et dos la moins chère du monde. Contrôle la phase de retour.",
+       alt:"Soulevé de terre roumain haltères, charge légère."},
+      {id:"c4",n:"Développé incliné haltères",m:"Haut de pecs",sets:3,lo:8,hi:12,rest:50,blk:"B",pos:2,
+       cue:"Troisième dose de pecs de la semaine, sur le haut, la zone qui remplit le t-shirt. Charge un peu plus légère qu'en séance A puisque tu es en fin de semaine.",
+       alt:"Machine à convergence inclinée."},
+
+      {id:"c5",n:"Élévations latérales poulie, unilatéral",m:"Deltoïde latéral",sets:4,lo:12,hi:15,rest:15,blk:"C",pos:1,uni:true,
+       cue:"Le rappel qui construit ta largeur. Tension constante, côté faible en premier, reps identiques des deux côtés.",
+       alt:"Élévations haltères."},
+      {id:"c6",n:"Curl poulie basse",m:"Biceps",sets:3,lo:12,hi:15,rest:30,blk:"C",pos:2,
+       cue:"Amplitude complète, coudes fixes, aucun balancier. La poulie garde la tension même en haut du mouvement, contrairement à l'haltère.",
+       alt:"Curl haltères debout."},
+
+      {id:"c7",n:"Élévations latérales haltères",m:"Deltoïde latéral",sets:3,lo:12,hi:20,rest:15,blk:"D",pos:1,
+       cue:"Oui, une deuxième fois dans la séance. Le deltoïde latéral récupère vite et c'est ta priorité esthétique n°1 : 15 séries par semaine, c'est ce qui va changer ta silhouette de face.",
+       alt:"Élévations à la machine."},
+      {id:"c8",n:"Extension triceps poulie haute (corde)",m:"Triceps",sets:3,lo:10,hi:15,rest:30,blk:"D",pos:2,
+       cue:"Dernière paire. Coudes collés, écarte la corde en fin de mouvement, contrôle la remontée. Tu peux finir à l'échec sur la dernière série.",
+       alt:"Barre droite à la poulie."}
     ]
   }
 };
-
 const ORDER = ["A","B","C"];
 
 const WARMUP = [
@@ -470,8 +507,10 @@ function coach(){
    ══════════════════════════════════════════ */
 
 let restLeft=0, restInt=null;
-function startRest(s){
-  restLeft=s; $("timer").classList.add("show"); paintRest();
+function startRest(s,label){
+  restLeft=s; $("timer").classList.add("show");
+  if($("tlab")) $("tlab").textContent=label||"Repos";
+  paintRest();
   clearInterval(restInt);
   restInt=setInterval(()=>{
     restLeft--; paintRest();
@@ -555,7 +594,8 @@ function vHome(){
       <div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
         <span class="chip">${p.ex.length} exercices</span>
         <span class="chip">${p.ex.reduce((a,e)=>a+e.sets,0)} séries</span>
-        <span class="chip">≈ 45 min</span>
+        <span class="chip">4 paires</span>
+        <span class="chip acc">${{A:"41",B:"39",C:"39"}[k]} min</span>
         ${isDeload()?`<span class="chip warn">Décharge</span>`:""}
       </div>
       <div style="height:18px"></div>
@@ -617,12 +657,14 @@ function vProg(){
       <div class="dim" style="font-size:13px;margin-top:4px">${p.focus}</div>
     </div>
     ${p.ex.map((e,i)=>`
-      <details>
-        <summary><span style="flex:1"><span class="dim num" style="margin-right:8px">${i+1}</span>${e.n}</span>
+      ${e.pos===1?`<div class="pairhead">Paire ${e.blk} — alterne les deux</div>`:""}
+      <details class="pairwrap">
+        <summary><span style="flex:1"><span class="dim num" style="margin-right:8px">${e.blk}${e.pos}</span>${e.n}</span>
           <span class="chip" style="flex:0 0 auto">${e.sets}×${e.lo}-${e.hi}</span></summary>
         <div class="inner">
           <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:11px">
-            <span class="chip acc">${e.m}</span><span class="chip">Repos ${e.rest?e.rest+" s":"enchaîné"}</span>
+            <span class="chip acc">${e.m}</span>
+            <span class="chip">${e.pos===1?"Enchaîne après "+e.rest+" s":"Pause "+e.rest+" s"}</span>
             ${e.uni?`<span class="chip warn">Unilatéral</span>`:""}
           </div>
           <div class="cue">${e.cue}</div>
@@ -634,6 +676,28 @@ function vProg(){
     <div class="sp"></div>
     <details><summary>Échauffement (6 min, non négociable)</summary>
       <div class="inner"><ol class="ol">${WARMUP.map(w=>`<li>${w}</li>`).join("")}</ol></div>
+    </details>
+    <details><summary>Séries appariées : le principe (lis ça en premier)</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span><b>Les exercices vont par deux.</b> Tu fais une série du premier, tu changes de poste, tu fais une série du second, tu prends la pause, tu recommences. Quatre paires par séance.</span></li>
+          <li><span class="dot"></span><span><b>Tu ne récupères pas moins, tu récupères ailleurs.</b> Sur la paire A de la séance 1, chaque muscle a toujours 120 secondes complètes entre deux de ses propres séries. Simplement, pendant que tes pecs récupèrent, ton dos travaille. Tes charges ne baissent pas d'un gramme.</span></li>
+          <li><span class="dot"></span><span><b>Ce que ça change :</b> 20 minutes de temps mort en moins par séance. Ce temps a été réinvesti en volume — 77 séries par semaine au lieu de 54, soit 43 % de stimulus en plus pour exactement la même durée à la salle.</span></li>
+          <li><span class="dot"></span><span><b>Les paires sont choisies pour ne pas se gêner :</b> une poussée avec un tirage, ou un gros muscle avec une isolation d'un groupe sans rapport. Jamais deux exercices qui sollicitent le même muscle.</span></li>
+          <li><span class="dot"></span><span><b>Le chrono te guide.</b> Après la série du premier exercice, il te donne le temps de changer de poste. Après celle du second, il lance la vraie pause. Tu n'as rien à compter.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details><summary>Jour d'affluence : le plan B</summary>
+      <div class="inner">
+        <ul class="li">
+          <li><span class="dot"></span><span><b>Le seul vrai obstacle aux paires, c'est de devoir monopoliser deux postes.</b> À 19 h un mardi, ça peut être impossible. Voilà quoi faire plutôt que d'improviser.</span></li>
+          <li><span class="dot"></span><span><b>Étape 1 — repli intelligent.</b> Garde en paires ce qui utilise des haltères ou une poulie : personne ne te prend une paire d'haltères, et les poulies sont souvent nombreuses. Ce sont les paires C et D de chaque séance.</span></li>
+          <li><span class="dot"></span><span><b>Étape 2 — si la paire A est impossible</b> (machine occupée), fais-la en séries classiques avec 120 s de repos, et <b>supprime la paire D</b> pour compenser le temps perdu. Tu restes autour de 42 minutes.</span></li>
+          <li><span class="dot"></span><span><b>Étape 3 — ordre de sacrifice.</b> Si tu dois couper encore : paire D d'abord, puis les 2 dernières séries de la paire C. Ne touche jamais à la paire A, c'est elle qui porte l'essentiel du résultat.</span></li>
+          <li><span class="dot"></span><span><b>Le plus simple reste d'éviter 18h-20h.</b> Une séance à midi ou à 21 h te fait gagner plus de temps que n'importe quelle optimisation de programme.</span></li>
+        </ul>
+      </div>
     </details>
     <details><summary>Comment charger la barre (double progression)</summary>
       <div class="inner">
@@ -653,7 +717,7 @@ function vProg(){
           <li><span class="dot"></span><span>Idéal : <b>lundi / mercredi / vendredi</b> ou <b>mardi / jeudi / samedi</b>. Au moins un jour de repos entre deux séances.</span></li>
           <li><span class="dot"></span><span><b>Semaines 7 et 14 : décharge.</b> Mêmes exercices, mêmes poids, moitié moins de séries. L'app te le rappellera.</span></li>
           <li><span class="dot"></span><span>Deux séances valent mieux qu'aucune. <b>Ne saute jamais deux semaines d'affilée</b> — c'est là que les gens ne reviennent plus.</span></li>
-          <li><span class="dot"></span><span><b>Si tu dépasses 45 min :</b> coupe la dernière série du dernier exercice, puis de l'avant-dernier. Jamais le premier exercice de la séance, c'est celui qui compte le plus. Les séances B et C sont les plus chargées à cause du travail unilatéral.</span></li>
+          <li><span class="dot"></span><span><b>Si tu dépasses 45 min :</b> supprime la paire D, puis les deux dernières séries de la paire C. Ne touche jamais à la paire A. Les séances tournent autour de 39 à 41 minutes échauffement compris, donc tu as de la marge.</span></li>
         </ul>
       </div>
     </details>
@@ -661,16 +725,18 @@ function vProg(){
       <div class="inner">
         <table>
           <tr><th>Muscle</th><th style="text-align:right">Séries/sem.</th><th style="text-align:right">Zone utile</th></tr>
-          <tr><td>Deltoïde latéral</td><td class="n">11</td><td class="n dim">10-20</td></tr>
-          <tr><td>Pectoraux</td><td class="n">10</td><td class="n dim">10-20</td></tr>
-          <tr><td>Dos</td><td class="n">9</td><td class="n dim">10-20</td></tr>
-          <tr><td>Biceps</td><td class="n">9</td><td class="n dim">6-15</td></tr>
-          <tr><td>Triceps</td><td class="n">6 + indirect</td><td class="n dim">6-15</td></tr>
-          <tr><td>Arrière d'épaules / trap. inf.</td><td class="n">4 + indirect</td><td class="n dim">4-10</td></tr>
-          <tr><td>Jambes</td><td class="n">5</td><td class="n dim">8-16</td></tr>
+          <tr><th>Muscle</th><th style="text-align:right">Avant</th><th style="text-align:right">Maintenant</th></tr>
+          <tr><td>Dos</td><td class="n dim">9</td><td class="n">16</td></tr>
+          <tr><td>Deltoïde latéral</td><td class="n dim">11</td><td class="n">15</td></tr>
+          <tr><td>Pectoraux</td><td class="n dim">10</td><td class="n">13</td></tr>
+          <tr><td>Triceps</td><td class="n dim">6</td><td class="n">9</td></tr>
+          <tr><td>Biceps</td><td class="n dim">9</td><td class="n">9</td></tr>
+          <tr><td>Arrière d'épaules</td><td class="n dim">4</td><td class="n">6</td></tr>
+          <tr><td>Jambes</td><td class="n dim">5</td><td class="n">6</td></tr>
+          <tr><td><b>Total</b></td><td class="n dim">54</td><td class="n">77</td></tr>
         </table>
         <div style="height:11px"></div>
-        <div class="dim" style="font-size:12.5px;line-height:1.5">Les jambes sont volontairement au minimum syndical parce que ce n'est pas ton objectif. Sois lucide : à terme, un haut du corps développé sur des jambes de sauterelle se voit. Si un jour tu passes à 4 séances, la quatrième sera une séance de jambes.<br><br>Quatre exercices sont unilatéraux : ils comptent double en temps mais c'est le prix à payer pour ne pas laisser ton côté fort creuser l'écart.</div>
+        <div class="dim" style="font-size:12.5px;line-height:1.5">Tout est dans la zone utile (10 à 20 séries hebdo pour les gros muscles, 6 à 15 pour les bras). Le gain est allé en priorité sur le dos et le deltoïde latéral, les deux muscles qui déterminent la largeur perçue.<br><br><b>Monte en deux temps :</b> les deux premières semaines, ne fais que les paires A, B et C. Tu ajoutes la paire D à partir de la semaine 3. Passer de 54 à 77 séries d'un coup après une reprise, c'est le meilleur moyen de te dégoûter en dix jours.<br><br>Les jambes restent au minimum syndical parce que ce n'est pas ton objectif. Sois lucide : à terme, un haut du corps développé sur des jambes de sauterelle se voit.</div>
       </div>
     </details>
     <div class="sp24"></div>
@@ -690,7 +756,7 @@ function setVal(exId,i,f,v){ S.active.sets[exId][i][f]=v; save(); }
 function toggleSet(exId,i){
   const s=S.active.sets[exId][i];
   s.d=!s.d; save();
-  if(s.d){ const e=exById(exId); if(e.rest) startRest(e.rest); }
+  if(s.d){ const e=exById(exId); if(e.rest) startRest(e.rest, e.pos===1?"Change de poste":"Pause"); }
   render();
 }
 function endSession(){
@@ -730,14 +796,19 @@ function vSession(){
       const allDone=sets.every(s=>s.d);
       const v=verdict(e);
       const lp=lastPerf(e.id);
+      const mate=p.ex.find(x=>x.blk===e.blk&&x.id!==e.id);
       return `
-      <div class="ex ${allDone?'done':''}">
+      ${e.pos===1?`<div class="pairhead">Paire ${e.blk} — alterne les deux</div>`:""}
+      <div class="ex ${allDone?'done':''} pairwrap">
         <div class="exhead">
           <div class="exidx">${allDone?'✓':i+1}</div>
           <div style="flex:1">
             <div class="exname">${e.n}</div>
-            <div class="exmeta">${e.m} · ${e.sets}×${e.lo}-${e.hi}${e.uni?" par bras":""} · repos ${e.rest?e.rest+" s":"superset"}</div>
-            ${e.uni?`<div style="margin-top:7px"><span class="chip warn">Unilatéral — commence par le côté faible</span></div>`:""}
+            <div class="exmeta">${e.m} · ${e.sets}×${e.lo}-${e.hi}${e.uni?" par bras":""} · ${e.pos===1?"enchaîne après "+e.rest+" s":"pause "+e.rest+" s"}</div>
+            <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap">
+              ${e.uni?`<span class="chip warn">Unilatéral — côté faible en premier</span>`:""}
+              <span class="chip">${e.pos===1?"puis → "+mate.n.slice(0,26):"puis ↩ "+mate.n.slice(0,26)}</span>
+            </div>
           </div>
         </div>
         <div class="exbody">
