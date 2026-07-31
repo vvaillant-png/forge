@@ -17,7 +17,9 @@
   --r:16px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--txt);}
+html,body{background:var(--bg);color:var(--txt);color-scheme:dark}
+input[type=date]{-webkit-appearance:none;appearance:none}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:pointer}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
   font-size:15px;line-height:1.45;
@@ -793,12 +795,19 @@ function sparkline(pts,w,h){
 }
 
 function addBW(){
-  const v=parseFloat(($("bwin")||{}).value);
-  if(!v||v<35||v>200) return;
-  S.bw=S.bw.filter(x=>x.d!==today());
-  S.bw.push({d:today(),kg:+v.toFixed(1)});
+  const f=$("bwin"), df=$("bwdate");
+  const v=parseFloat((f||{}).value);
+  const d=((df||{}).value)||today();
+  if(!v||v<35||v>200){ if(f){f.style.borderColor="var(--bad)"; f.focus();} return; }
+  if(d>today()) return;
+  S.bw=S.bw.filter(x=>x.d!==d);
+  S.bw.push({d:d,kg:+v.toFixed(1)});
   S.bw.sort((a,b)=>a.d<b.d?-1:1);
   save(); render();
+}
+function delBW(d){
+  if(!confirm("Supprimer la pesée du "+fdate(d)+" ?")) return;
+  S.bw=S.bw.filter(x=>x.d!==d); save(); render();
 }
 
 function vStats(){
@@ -819,10 +828,21 @@ function vStats(){
       </div>
       ${sparkline(pts,320,110)}
       <div style="height:12px"></div>
-      <div class="row">
-        <input class="inp" id="bwin" inputmode="decimal" placeholder="${t?t.cur:"66"} kg" style="flex:1;text-align:left;padding-left:14px">
-        <button class="btn sm" onclick="addBW()">Enregistrer</button>
+      <div class="row" style="gap:8px">
+        <input class="inp" type="date" id="bwdate" value="${today()}" max="${today()}" style="flex:1.15;text-align:left;padding:11px 10px;font-size:14px;font-weight:600">
+        <input class="inp" id="bwin" inputmode="decimal" placeholder="${t?t.cur:"66"} kg" style="flex:.85;text-align:left;padding-left:12px">
+        <button class="btn sm" onclick="addBW()" style="flex:0 0 auto">Ajouter</button>
       </div>
+      ${pts.length?`<details style="background:transparent;border:none;margin:6px 0 0">
+        <summary style="padding:9px 0;font-size:12.5px;color:var(--dim);font-weight:650">Historique des pesées (${pts.length})</summary>
+        <div class="inner" style="padding:0 0 2px">
+          ${[...pts].reverse().map(x=>`<div class="between" style="padding:9px 0;border-bottom:1px solid var(--line)">
+            <span class="dim" style="font-size:13px">${fdate(x.d)}${daysAgo(x.d)===0?" · aujourd'hui":""}</span>
+            <span class="row" style="gap:14px">
+              <b class="num" style="font-size:14px">${x.kg} kg</b>
+              <button onclick="delBW('${x.d}')" style="color:var(--bad);font-size:12px;font-weight:700;padding:2px 0">Suppr.</button>
+            </span></div>`).join("")}
+        </div></details>`:""}
       <div style="height:10px"></div>
       <div class="dim" style="font-size:12.5px;line-height:1.5">
         ${t&&t.delta!==null
