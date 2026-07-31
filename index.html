@@ -110,6 +110,10 @@ nav span{font-size:10px;font-weight:700;letter-spacing:.2px}
   text-transform:uppercase;color:var(--acc);margin:20px 2px 9px}
 .pairhead:first-child{margin-top:4px}
 .pairhead::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(216,255,62,.35),transparent)}
+.pairhead.p3{color:var(--dim)}
+.pairhead.p3::after{background:linear-gradient(90deg,var(--line),transparent)}
+.pairhead.p4{color:var(--dim2)}
+.pairhead.p4::after{background:linear-gradient(90deg,var(--line),transparent)}
 .pairwrap{border-left:2px solid rgba(216,255,62,.22);padding-left:10px;margin-bottom:4px}
 
 /* ---------- exercise ---------- */
@@ -319,6 +323,11 @@ const PROGRAM = {
 };
 const ORDER = ["A","B","C"];
 
+// Priorité des paires. L'ordre d'EXÉCUTION reste A → B → C → D (le plus lourd quand tu es frais).
+// L'ordre de PRIORITÉ est différent : c'est celui dans lequel tu coupes si tu manques de temps.
+const PRIO   = {A:1, C:2, B:3, D:4};
+const PRIOLBL= {1:"incompressible", 2:"ta largeur d'épaules", 3:"sacrifiable", 4:"à couper en premier"};
+
 const WARMUP = [
   "3 min de rameur ou vélo, rythme facile — juste pour monter la température.",
   "<b>Glissements au mur × 10.</b> Dos au mur, avant-bras contre le mur, tu montes et descends les bras en gardant le contact. Réveille les trapèzes inférieurs et le dentelé antérieur, les deux muscles qui plaquent l'omoplate contre les côtes.",
@@ -471,6 +480,7 @@ function coach(){
     out.push("On commence par la <b>Séance A — "+PROGRAM.A.name+"</b>. Ton seul objectif aujourd'hui : noter des chiffres, pas soulever lourd. Choisis des poids où tu t'arrêtes à 2 reps de l'échec.");
     out.push("<b>Les exercices vont par paires : tu alternes les deux.</b> Une série du premier, tu changes de poste, une série du second, puis la pause. Le chrono te guide à chaque fois — lis « Séries appariées » dans l'onglet Programme avant de partir.");
     out.push("<b>Les deux premières semaines, ne fais que les paires A, B et C.</b> Tu ajouteras la paire D à partir de la semaine 3. Inutile de tout encaisser d'un coup.");
+    out.push("<b>Si un jour tu es pressé, coupe dans l'ordre D → B → C, jamais A.</b> Ce n'est pas l'ordre d'exécution : la paire C contient tes élévations latérales, elle passe avant la paire B en priorité.");
     return out;
   }
 
@@ -659,7 +669,7 @@ function vProg(){
       <div class="dim" style="font-size:13px;margin-top:4px">${p.focus}</div>
     </div>
     ${p.ex.map((e,i)=>`
-      ${e.pos===1?`<div class="pairhead">Paire ${e.blk} — alterne les deux</div>`:""}
+      ${e.pos===1?`<div class="pairhead p${PRIO[e.blk]}">Paire ${e.blk} · P${PRIO[e.blk]} — ${PRIOLBL[PRIO[e.blk]]}</div>`:""}
       <details class="pairwrap">
         <summary><span style="flex:1"><span class="dim num" style="margin-right:8px">${e.blk}${e.pos}</span>${e.n}</span>
           <span class="chip" style="flex:0 0 auto">${e.sets}×${e.lo}-${e.hi}</span></summary>
@@ -690,13 +700,37 @@ function vProg(){
         </ul>
       </div>
     </details>
+    <details><summary>Si tu es pressé : quoi couper, dans quel ordre</summary>
+      <div class="inner">
+        <div class="hint" style="margin-bottom:13px">
+          <b>Attention, piège :</b> l'ordre d'exécution n'est pas l'ordre de priorité. Tu fais les paires dans l'ordre A → B → C → D parce que le plus lourd se fait quand tu es frais. Mais si tu dois couper, tu ne coupes <b>pas</b> simplement par la fin.
+        </div>
+        <ul class="li">
+          <li><span class="dot"></span><span><b>P1 · Paire A — incompressible.</b> Les deux plus gros exercices de la séance. Elle porte à elle seule l'essentiel du résultat. Tu ne la touches jamais, même pour une séance de 20 minutes.</span></li>
+          <li><span class="dot"></span><span><b>P2 · Paire C — ta largeur d'épaules.</b> C'est elle qui contient les élévations latérales, le muscle n°1 de ton objectif esthétique. Elle passe <b>avant</b> la paire B dans l'ordre de priorité, même si elle se fait après dans l'ordre d'exécution. C'est le point que la plupart des gens ratent : ils coupent par la fin et sacrifient exactement ce qu'ils voulaient développer.</span></li>
+          <li><span class="dot"></span><span><b>P3 · Paire B — sacrifiable.</b> Volume secondaire. Ton dos est à 16 séries par semaine, le plus servi de tous : en sauter une partie ne te coûte presque rien.</span></li>
+          <li><span class="dot"></span><span><b>P4 · Paire D — à couper en premier.</b> C'est le bonus de fin de séance. Sur une semaine chargée, tu peux la supprimer des trois séances sans culpabiliser.</span></li>
+        </ul>
+        <div style="height:14px"></div>
+        <div class="eyebrow" style="margin-bottom:8px">Durée réelle selon ce que tu gardes</div>
+        <table>
+          <tr><th>Tu fais</th><th style="text-align:right">Séance A</th><th style="text-align:right">B</th><th style="text-align:right">C</th></tr>
+          <tr><td>Paire A seule</td><td class="n">16 min</td><td class="n">15 min</td><td class="n">14 min</td></tr>
+          <tr><td>Paires A + C</td><td class="n">25 min</td><td class="n">25 min</td><td class="n">25 min</td></tr>
+          <tr><td>A + C + B</td><td class="n">35 min</td><td class="n">33 min</td><td class="n">33 min</td></tr>
+          <tr><td><b>Tout</b></td><td class="n">41 min</td><td class="n">39 min</td><td class="n">39 min</td></tr>
+        </table>
+        <div style="height:11px"></div>
+        <div class="dim" style="font-size:12.5px;line-height:1.5">Échauffement de 6 minutes compris dans tous les cas. <b style="color:var(--txt)">Une séance de 25 minutes bien faite reste très largement supérieure à une séance sautée</b> — c'est tout l'intérêt d'avoir cet ordre en tête plutôt que d'improviser une fois sur place.</div>
+      </div>
+    </details>
     <details><summary>Jour d'affluence : le plan B</summary>
       <div class="inner">
         <ul class="li">
           <li><span class="dot"></span><span><b>Le seul vrai obstacle aux paires, c'est de devoir monopoliser deux postes.</b> À 19 h un mardi, ça peut être impossible. Voilà quoi faire plutôt que d'improviser.</span></li>
           <li><span class="dot"></span><span><b>Étape 1 — repli intelligent.</b> Garde en paires ce qui utilise des haltères ou une poulie : personne ne te prend une paire d'haltères, et les poulies sont souvent nombreuses. Ce sont les paires C et D de chaque séance.</span></li>
-          <li><span class="dot"></span><span><b>Étape 2 — si la paire A est impossible</b> (machine occupée), fais-la en séries classiques avec 120 s de repos, et <b>supprime la paire D</b> pour compenser le temps perdu. Tu restes autour de 42 minutes.</span></li>
-          <li><span class="dot"></span><span><b>Étape 3 — ordre de sacrifice.</b> Si tu dois couper encore : paire D d'abord, puis les 2 dernières séries de la paire C. Ne touche jamais à la paire A, c'est elle qui porte l'essentiel du résultat.</span></li>
+          <li><span class="dot"></span><span><b>Étape 2 — si la paire A est impossible</b> (machine occupée), fais-la en séries classiques avec 120 s de repos, et <b>supprime la paire D</b> pour compenser. Tu restes autour de 42 minutes.</span></li>
+          <li><span class="dot"></span><span><b>Étape 3 — tu appliques l'ordre de priorité ci-dessus :</b> D, puis B, puis C. La paire A ne se coupe jamais.</span></li>
           <li><span class="dot"></span><span><b>Le plus simple reste d'éviter 18h-20h.</b> Une séance à midi ou à 21 h te fait gagner plus de temps que n'importe quelle optimisation de programme.</span></li>
         </ul>
       </div>
@@ -719,7 +753,7 @@ function vProg(){
           <li><span class="dot"></span><span>Idéal : <b>lundi / mercredi / vendredi</b> ou <b>mardi / jeudi / samedi</b>. Au moins un jour de repos entre deux séances.</span></li>
           <li><span class="dot"></span><span><b>Semaines 7 et 14 : décharge.</b> Mêmes exercices, mêmes poids, moitié moins de séries. L'app te le rappellera.</span></li>
           <li><span class="dot"></span><span>Deux séances valent mieux qu'aucune. <b>Ne saute jamais deux semaines d'affilée</b> — c'est là que les gens ne reviennent plus.</span></li>
-          <li><span class="dot"></span><span><b>Si tu dépasses 45 min :</b> supprime la paire D, puis les deux dernières séries de la paire C. Ne touche jamais à la paire A. Les séances tournent autour de 39 à 41 minutes échauffement compris, donc tu as de la marge.</span></li>
+          <li><span class="dot"></span><span><b>Si tu dépasses 45 min :</b> tu coupes dans l'ordre <b>D, puis B, puis C</b> — jamais A. Attention, ce n'est pas l'ordre d'exécution : voir « Si tu es pressé » plus bas, c'est important.</span></li>
         </ul>
       </div>
     </details>
@@ -800,7 +834,7 @@ function vSession(){
       const lp=lastPerf(e.id);
       const mate=p.ex.find(x=>x.blk===e.blk&&x.id!==e.id);
       return `
-      ${e.pos===1?`<div class="pairhead">Paire ${e.blk} — alterne les deux</div>`:""}
+      ${e.pos===1?`<div class="pairhead p${PRIO[e.blk]}">Paire ${e.blk} · P${PRIO[e.blk]} — ${PRIOLBL[PRIO[e.blk]]}</div>`:""}
       <div class="ex ${allDone?'done':''} pairwrap">
         <div class="exhead">
           <div class="exidx">${allDone?'✓':i+1}</div>
