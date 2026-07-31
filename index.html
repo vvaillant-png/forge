@@ -468,7 +468,9 @@ function coach(){
   const t=bwTrend();
 
   if(n===0){
-    out.push("On commence par la <b>Séance A — Poussée</b>. Ton seul objectif aujourd'hui : noter des chiffres. Choisis des poids où tu t'arrêtes à 2 reps de l'échec. La semaine 1 ne sert qu'à calibrer.");
+    out.push("On commence par la <b>Séance A — "+PROGRAM.A.name+"</b>. Ton seul objectif aujourd'hui : noter des chiffres, pas soulever lourd. Choisis des poids où tu t'arrêtes à 2 reps de l'échec.");
+    out.push("<b>Les exercices vont par paires : tu alternes les deux.</b> Une série du premier, tu changes de poste, une série du second, puis la pause. Le chrono te guide à chaque fois — lis « Séries appariées » dans l'onglet Programme avant de partir.");
+    out.push("<b>Les deux premières semaines, ne fais que les paires A, B et C.</b> Tu ajouteras la paire D à partir de la semaine 3. Inutile de tout encaisser d'un coup.");
     return out;
   }
 
