@@ -399,12 +399,13 @@ function load(){
   try{ const r=localStorage.getItem(KEY); return r?JSON.parse(r):blank(); }
   catch(e){ storageOK=false; return mem||blank(); }
 }
-function blank(){ return {logs:[], bw:[], active:null, start:null}; }
+function blank(){ return {logs:[], bw:[], active:null, start:null, mode:"pair"}; }
 function save(){
   try{ localStorage.setItem(KEY,JSON.stringify(S)); }
   catch(e){ storageOK=false; mem=S; }
 }
 let S=load();
+if(!S.mode) S.mode="pair";
 
 /* ══════════════════════════════════════════
    4. HELPERS
@@ -416,6 +417,30 @@ const allEx=()=>ORDER.flatMap(k=>PROGRAM[k].ex);
 const exById=id=>allEx().find(e=>e.id===id);
 function fdate(d){ return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short"}); }
 function daysAgo(d){ return Math.round((new Date(today())-new Date(d))/864e5); }
+
+/* ---- modes : paires (salle calme) vs classique (salle bondée) ---- */
+function wk(e){ return e.uni?70:(/^Presse/.test(e.n)?45:35); }          // durée d'une série, en s
+function mateOf(k,e){ return PROGRAM[k].ex.find(x=>x.blk===e.blk&&x.id!==e.id); }
+function soloRest(k,e){ const m=mateOf(k,e); return e.rest+wk(m)+m.rest; } // repos réel du muscle
+// En mode classique on ne garde que les paires P1 et P2 : sinon la séance dépasse une heure.
+function sessionEx(k,mode){ return PROGRAM[k].ex.filter(e=> mode!=="solo" || PRIO[e.blk]<=2 ); }
+function restOf(k,e,mode){ return mode==="solo" ? soloRest(k,e) : e.rest; }
+function estMin(k,mode){
+  const ex=sessionEx(k,mode); let s=0;
+  if(mode==="solo"){
+    ex.forEach(e=>{ s+=e.sets*(wk(e)+soloRest(k,e)); });
+    s+=(ex.length-1)*45;
+  } else {
+    const b={}; ex.forEach(e=>{(b[e.blk]=b[e.blk]||[]).push(e)});
+    Object.values(b).forEach(([x,y])=>{ s+=Math.max(x.sets,y.sets)*(wk(x)+x.rest+wk(y)+y.rest); });
+    s+=(Object.keys(b).length-1)*45;
+  }
+  return Math.round((s+360)/60);
+}
+function setMode(m){
+  if(S.active){ alert("Termine ou abandonne la séance en cours avant de changer de mode."); return; }
+  S.mode=m; save(); render();
+}
 
 function nextKey(){
   if(!S.logs.length) return "A";
@@ -598,16 +623,26 @@ function vHome(){
       ${coach().map(c=>`<p>${c}</p>`).join("")}
     </div>
 
+    <div class="pillbar">
+      <button class="${S.mode==='pair'?'on':''}" onclick="setMode('pair')">Paires · salle calme</button>
+      <button class="${S.mode==='solo'?'on':''}" onclick="setMode('solo')">Classique · salle bondée</button>
+    </div>
+    <div class="dim" style="font-size:12px;line-height:1.45;margin:-4px 2px 14px">
+      ${S.mode==='pair'
+        ? "Tu alternes deux exercices pendant les temps de repos. Il te faut deux postes libres, mais tu fais 43 % de volume en plus dans le même temps."
+        : "Un exercice à la fois, un seul poste occupé, repos complet entre les séries. Tu ne fais que les paires <b>A</b> et <b>C</b>, les deux prioritaires — sinon la séance dépasse une heure. C'est un repli pour les jours d'affluence, pas un équivalent."}
+    </div>
+
     <div class="sesshero">
       <span class="tag">Séance ${k}</span>
       <div style="height:12px"></div>
       <div class="h1" style="font-size:30px">${p.name}</div>
       <div class="dim" style="font-size:14px;margin-top:2px">${p.sub}</div>
       <div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
-        <span class="chip">${p.ex.length} exercices</span>
-        <span class="chip">${p.ex.reduce((a,e)=>a+e.sets,0)} séries</span>
-        <span class="chip">4 paires</span>
-        <span class="chip acc">${{A:"41",B:"39",C:"39"}[k]} min</span>
+        <span class="chip">${sessionEx(k,S.mode).length} exercices</span>
+        <span class="chip">${sessionEx(k,S.mode).reduce((a,e)=>a+e.sets,0)} séries</span>
+        <span class="chip">${S.mode==='pair'?"4 paires":"séries classiques"}</span>
+        <span class="chip acc">${estMin(k,S.mode)} min</span>
         ${isDeload()?`<span class="chip warn">Décharge</span>`:""}
       </div>
       <div style="height:18px"></div>
@@ -760,7 +795,6 @@ function vProg(){
     <details><summary>Volume hebdomadaire par muscle</summary>
       <div class="inner">
         <table>
-          <tr><th>Muscle</th><th style="text-align:right">Séries/sem.</th><th style="text-align:right">Zone utile</th></tr>
           <tr><th>Muscle</th><th style="text-align:right">Avant</th><th style="text-align:right">Maintenant</th></tr>
           <tr><td>Dos</td><td class="n dim">9</td><td class="n">16</td></tr>
           <tr><td>Deltoïde latéral</td><td class="n dim">11</td><td class="n">15</td></tr>
@@ -782,8 +816,8 @@ function vProg(){
 /* ---------- SÉANCE ---------- */
 function beginSession(k){
   if(!S.start) S.start=today();
-  S.active={key:k,date:today(),sets:{},t0:Date.now()};
-  PROGRAM[k].ex.forEach(e=>{
+  S.active={key:k,date:today(),sets:{},t0:Date.now(),mode:S.mode};
+  sessionEx(k,S.mode).forEach(e=>{
     S.active.sets[e.id]=Array.from({length:e.sets},()=>({w:"",r:"",d:false}));
   });
   save(); tab="session"; render(); window.scrollTo(0,0);
@@ -792,7 +826,11 @@ function setVal(exId,i,f,v){ S.active.sets[exId][i][f]=v; save(); }
 function toggleSet(exId,i){
   const s=S.active.sets[exId][i];
   s.d=!s.d; save();
-  if(s.d){ const e=exById(exId); if(e.rest) startRest(e.rest, e.pos===1?"Change de poste":"Pause"); }
+  if(s.d){
+    const e=exById(exId), md=S.active.mode||"pair";
+    const r=restOf(S.active.key,e,md);
+    if(r) startRest(r, md==="solo" ? "Pause" : (e.pos===1?"Change de poste":"Pause"));
+  }
   render();
 }
 function endSession(){
@@ -801,12 +839,13 @@ function endSession(){
   if(!any){ if(!confirm("Aucune série enregistrée. Abandonner la séance ?")) return; S.active=null; save(); tab="home"; render(); return; }
   a.dur=Math.round((Date.now()-a.t0)/60000);
   Object.keys(a.sets).forEach(k=>{ a.sets[k]=a.sets[k].filter(s=>s.w||s.r); });
-  S.logs.push({date:a.date,key:a.key,sets:a.sets,dur:a.dur});
+  S.logs.push({date:a.date,key:a.key,sets:a.sets,dur:a.dur,mode:a.mode||"pair"});
   S.active=null; save(); stopRest(); tab="stats"; render(); window.scrollTo(0,0);
 }
 
 function vSession(){
   const a=S.active, p=PROGRAM[a.key];
+  const md=a.mode||"pair", list=sessionEx(a.key,md);
   const doneSets=Object.values(a.sets).flat().filter(s=>s.d).length;
   const totSets=Object.values(a.sets).flat().length;
   const pct=Math.round(doneSets/totSets*100);
@@ -814,7 +853,7 @@ function vSession(){
 
   return `
   <div class="topbar">
-    <div><div class="eyebrow">En cours · ${mins} min</div><div class="h1">${p.name}</div></div>
+    <div><div class="eyebrow">En cours · ${mins} min · ${md==="solo"?"mode classique":"mode paires"}</div><div class="h1">${p.name}</div></div>
     <button class="btn ghost sm" onclick="endSession()">Terminer</button>
   </div>
   <div class="wrap">
@@ -827,23 +866,25 @@ function vSession(){
     </div>
     ${isDeload()?`<div class="banner">Semaine de décharge : ne fais que la moitié des séries de chaque exercice, avec les mêmes poids.</div>`:""}
 
-    ${p.ex.map((e,i)=>{
+    ${list.map((e,i)=>{
       const sets=a.sets[e.id];
       const allDone=sets.every(s=>s.d);
       const v=verdict(e);
       const lp=lastPerf(e.id);
-      const mate=p.ex.find(x=>x.blk===e.blk&&x.id!==e.id);
+      const mate=mateOf(a.key,e);
+      const r=restOf(a.key,e,md);
       return `
-      ${e.pos===1?`<div class="pairhead p${PRIO[e.blk]}">Paire ${e.blk} · P${PRIO[e.blk]} — ${PRIOLBL[PRIO[e.blk]]}</div>`:""}
-      <div class="ex ${allDone?'done':''} pairwrap">
+      ${md!=="solo"&&e.pos===1?`<div class="pairhead p${PRIO[e.blk]}">Paire ${e.blk} · P${PRIO[e.blk]} — ${PRIOLBL[PRIO[e.blk]]}</div>`
+        :md==="solo"?`<div class="pairhead p${PRIO[e.blk]}">${e.blk}${e.pos} · P${PRIO[e.blk]} — ${PRIOLBL[PRIO[e.blk]]}</div>`:""}
+      <div class="ex ${allDone?'done':''} ${md==="solo"?'':'pairwrap'}">
         <div class="exhead">
           <div class="exidx">${allDone?'✓':i+1}</div>
           <div style="flex:1">
             <div class="exname">${e.n}</div>
-            <div class="exmeta">${e.m} · ${e.sets}×${e.lo}-${e.hi}${e.uni?" par bras":""} · ${e.pos===1?"enchaîne après "+e.rest+" s":"pause "+e.rest+" s"}</div>
+            <div class="exmeta">${e.m} · ${e.sets}×${e.lo}-${e.hi}${e.uni?" par bras":""} · ${md==="solo"?"pause "+r+" s":(e.pos===1?"enchaîne après "+r+" s":"pause "+r+" s")}</div>
             <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap">
               ${e.uni?`<span class="chip warn">Unilatéral — côté faible en premier</span>`:""}
-              <span class="chip">${e.pos===1?"puis → "+mate.n.slice(0,26):"puis ↩ "+mate.n.slice(0,26)}</span>
+              ${md==="solo"?"":`<span class="chip">${e.pos===1?"puis → "+mate.n.slice(0,26):"puis ↩ "+mate.n.slice(0,26)}</span>`}
             </div>
           </div>
         </div>
@@ -977,28 +1018,80 @@ function vStats(){
       ${last8.length?last8.map(l=>{
         const vol=Object.values(l.sets).flat().reduce((a,s)=>a+((parseFloat(s.w)||0)*(parseInt(s.r)||0)),0);
         const ns=Object.values(l.sets).flat().length;
-        return `<div class="between" style="padding:11px 0;border-bottom:1px solid var(--line)">
-          <div><div style="font-weight:700;font-size:14px">${PROGRAM[l.key].name}</div>
-          <div class="dim" style="font-size:12px">${fdate(l.date)} · ${ns} séries${l.dur?" · "+l.dur+" min":""}</div></div>
+        const solo=l.mode==="solo";
+        return `<div class="between" style="padding:12px 0;border-bottom:1px solid var(--line)">
+          <div style="flex:1;min-width:0">
+            <div class="row" style="gap:7px;margin-bottom:3px">
+              <span class="tag" style="font-size:9px;padding:3px 6px">${l.key}</span>
+              <span style="font-weight:700;font-size:14px">${PROGRAM[l.key].name}</span>
+            </div>
+            <div class="row" style="gap:6px;flex-wrap:wrap">
+              <span class="chip ${solo?'':'acc'}" style="padding:3px 8px;font-size:11px">${solo?"Classique":"Paires"}</span>
+              <span class="dim" style="font-size:12px">${fdate(l.date)} · ${ns} séries${l.dur?" · "+l.dur+" min":""}</span>
+            </div>
+          </div>
           <div class="num" style="font-weight:800;font-size:14px">${Math.round(vol).toLocaleString("fr-FR")} kg</div>
         </div>`}).join(""):`<div class="dim" style="font-size:13px">Aucune séance enregistrée.</div>`}
     </div>
 
-    <div class="sp"></div>
-    <div class="row" style="gap:8px">
-      <button class="btn ghost sm" style="flex:1" onclick="exportData()">Exporter mes données</button>
-      <button class="btn danger sm" style="flex:1" onclick="if(confirm('Tout effacer définitivement ?')){S=blank();save();render()}">Réinitialiser</button>
+    <div class="card">
+      <div class="h2" style="margin-bottom:5px">Exporter</div>
+      <div class="dim" style="font-size:12.5px;line-height:1.5;margin-bottom:13px">
+        Le <b style="color:var(--txt)">CSV</b> s'ouvre directement dans Excel ou Numbers : une ligne par série, avec la date, la séance, le mode, l'exercice, le muscle, la charge, les reps et le volume. Décimales à la virgule, deux fichiers séparés (séances et pesées).<br><br>
+        Le <b style="color:var(--txt)">JSON</b> ne sert qu'à sauvegarder avant de changer de téléphone. Il n'est pas fait pour être lu.
+      </div>
+      <div class="row" style="gap:8px">
+        <button class="btn sm" style="flex:1" onclick="exportCSV()">CSV lisible</button>
+        <button class="btn ghost sm" style="flex:1" onclick="exportJSON()">Sauvegarde JSON</button>
+      </div>
+      <div style="height:10px"></div>
+      <button class="btn danger sm" style="width:100%" onclick="if(confirm('Tout effacer définitivement ? Exporte d\\'abord si tu veux garder une trace.')){S=blank();save();render()}">Tout effacer</button>
     </div>
     <div class="sp24"></div>
   </div>`;
 }
 
-function exportData(){
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+/* ---------- export ---------- */
+function csvCell(v){ return '"'+String(v==null?"":v).replace(/"/g,'""')+'"'; }
+function csvNum(v){ return '"'+String(v).replace(".",",")+'"'; }   // virgule décimale, format FR
+function download(name,text,type){
+  const blob=new Blob([type?text:"﻿"+text],{type:type||"text/csv;charset=utf-8;"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="forge-"+today()+".json";
+  a.href=URL.createObjectURL(blob); a.download=name;
+  if(document.body&&document.body.appendChild) document.body.appendChild(a);
   a.click();
+  if(a.remove) a.remove();
+  setTimeout(()=>{ try{URL.revokeObjectURL(a.href)}catch(e){} },3000);
+}
+function exportCSV(){
+  if(!S.logs.length&&!S.bw.length){ alert("Rien à exporter pour l'instant."); return 0; }
+  let files=0;
+  if(S.logs.length){
+    const head=["Date","Séance","Mode","Bloc","Priorité","Exercice","Muscle","Série","Poids (kg)","Reps","Volume (kg)"];
+    const rows=[head.map(csvCell).join(";")];
+    [...S.logs].sort((a,b)=>a.date<b.date?-1:1).forEach(l=>{
+      const p=PROGRAM[l.key];
+      p.ex.forEach(e=>{
+        (l.sets[e.id]||[]).forEach((s,i)=>{
+          const w=parseFloat(s.w)||0, r=parseInt(s.r)||0;
+          if(!w&&!r) return;
+          rows.push([csvCell(l.date),csvCell(p.name),csvCell(l.mode==="solo"?"Classique":"Paires"),
+            csvCell(e.blk+e.pos),csvCell("P"+PRIO[e.blk]),csvCell(e.n),csvCell(e.m),
+            csvCell(i+1),csvNum(w),csvCell(r),csvNum(+(w*r).toFixed(1))].join(";"));
+        });
+      });
+    });
+    download("forge-seances-"+today()+".csv", rows.join("\r\n")); files++;
+  }
+  if(S.bw.length){
+    const b=[["Date","Poids (kg)"].map(csvCell).join(";")]
+      .concat([...S.bw].sort((a,b)=>a.d<b.d?-1:1).map(x=>[csvCell(x.d),csvNum(x.kg)].join(";")));
+    setTimeout(()=>download("forge-poids-"+today()+".csv", b.join("\r\n")),600); files++;
+  }
+  return files;
+}
+function exportJSON(){
+  download("forge-sauvegarde-"+today()+".json", JSON.stringify(S,null,2), "application/json");
 }
 
 /* ---------- NUTRITION ---------- */
